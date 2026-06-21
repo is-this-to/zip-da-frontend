@@ -4,8 +4,14 @@ import MyButton from "./button/MyButton.vue";
 
 // 로그인 구현후 변경바람
 //---------------------------
-const isLoggedIn = ref(false);
+ // const isLoggedIn = ref(false);
 //---------------------------
+
+//---장수린-------
+const isLoggedIn = true;
+//---------------
+
+
 </script>
 
 <template>
