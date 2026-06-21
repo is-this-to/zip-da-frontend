@@ -102,6 +102,7 @@ const submitSignup = async () => {
           :content="'비밀번호'"
           :placeholder="'8~20자 / 영문, 숫자, 특수문자 포함'"
           :required="true"
+          :auth-complete="'new-password'"
           v-model="signUpForm.password"
           v-model:is-show-password="showPassword"
           :is-pass-word="true"
@@ -113,6 +114,7 @@ const submitSignup = async () => {
           v-model="signUpForm.passwordCk"
           v-model:is-show-password="showPasswordCk"
           :is-pass-word="true"
+          :auth-complete="'new-password'"
         ></MyInput>
         <MyInput
           :content="'이름'"
@@ -130,6 +132,7 @@ const submitSignup = async () => {
         ></MyInput>
         <MyInput
           :content="'번호'"
+          :auth-complete="'tel'"
           :placeholder="'01012345678'"
           :required="false"
           v-model="signUpForm.phone"

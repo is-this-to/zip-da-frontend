@@ -75,6 +75,7 @@ const resultInputType = computed(() => {
   color: #101828;
   font-size: 16px;
   transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  background: #ffffff;
 }
 
 .field-group input:focus {

@@ -81,10 +81,10 @@ const submitLogin = async () => {
         <MyInput
             v-model="signInForm.password"
             v-model:is-show-password="showPassword"
-            content="비밀번호"
-            auth-complete="current-password"
-            placeholder="비밀번호 입력해주세요"
-            required
+            :content="'비밀번호'"
+            :auth-complete="'current-password'"
+            :placeholder="'비밀번호 입력해주세요'"
+            :required="true"
             :is-pass-word="true"
         ></MyInput>
 
