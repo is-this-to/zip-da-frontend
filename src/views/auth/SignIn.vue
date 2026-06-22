@@ -27,7 +27,7 @@ const submitLogin = async () => {
   const emailValResult = signInValidator.email(signInForm.email);
   const passwordValResult = signInValidator.password(signInForm.password);
   // 유효성 성공하면 if절
-  if(!emailValResult && !passwordValResult) {
+  if (!emailValResult && !passwordValResult) {
     try {
       isSubmitting.value = true;
       errorMessage.value = "";
@@ -38,19 +38,24 @@ const submitLogin = async () => {
     } finally {
       isSubmitting.value = false;
     }
-  }
-  else {
-    errorMessage.value = `${emailValResult}\n${passwordValResult}`;
+  } else {
+    const validationMessages = [emailValResult, passwordValResult].filter(
+      Boolean,
+    );
+    errorMessage.value = validationMessages.join("\n");
   }
 };
-
 </script>
 
 <template>
   <main class="login-page">
     <section class="login-shell">
       <div class="brand-panel">
-        <RouterLink to="/main" class="brand-mark" aria-label="집다 메인으로 이동">
+        <RouterLink
+          to="/main"
+          class="brand-mark"
+          aria-label="집다 메인으로 이동"
+        >
           <strong>ZIPDA</strong>
         </RouterLink>
 
@@ -58,7 +63,8 @@ const submitLogin = async () => {
           <p class="eyebrow">Welcome back</p>
           <h1>좋은 집을 찾는 여정을<br />다시 이어가세요.</h1>
           <p>
-            저장한 검색 조건, 관심 매물까지 로그인 후 한 번에 확인할 수 있습니다.
+            저장한 검색 조건, 관심 매물까지 로그인 후 한 번에 확인할 수
+            있습니다.
           </p>
         </div>
       </div>
@@ -79,13 +85,13 @@ const submitLogin = async () => {
         ></MyInput>
 
         <MyInput
-            v-model="signInForm.password"
-            v-model:is-show-password="showPassword"
-            :content="'비밀번호'"
-            :auth-complete="'current-password'"
-            :placeholder="'비밀번호 입력해주세요'"
-            :required="true"
-            :is-pass-word="true"
+          v-model="signInForm.password"
+          v-model:is-show-password="showPassword"
+          :content="'비밀번호'"
+          :auth-complete="'current-password'"
+          :placeholder="'비밀번호 입력해주세요'"
+          :required="true"
+          :is-pass-word="true"
         ></MyInput>
 
         <div class="form-row">
@@ -98,7 +104,7 @@ const submitLogin = async () => {
 
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         <MyButton
-          :content='isSubmitting ? "로그인 중..." : "로그인" '
+          :content="isSubmitting ? '로그인 중...' : '로그인'"
           :color="'blue'"
           :size="'middle'"
           :class="'submit-button'"
@@ -112,8 +118,12 @@ const submitLogin = async () => {
         </div>
 
         <div class="social-grid">
-          <button type="button" class="kakao-button" @click="notYet">Kakao</button>
-          <button type="button" class="naver-button" @click="notYet">Naver</button>
+          <button type="button" class="kakao-button" @click="notYet">
+            Kakao
+          </button>
+          <button type="button" class="naver-button" @click="notYet">
+            Naver
+          </button>
         </div>
 
         <p class="signup-copy">
