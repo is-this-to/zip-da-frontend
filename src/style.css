@@ -2,8 +2,8 @@
 :root {
   --personal-color-blue: #0064ff;
   --personal-color-gray: #545f6e;
-  --personal-color-white: #ffffff;
-  --personal-color-black: #000000;
+  --personal-color-white: #f8f9fd;
+  --personal-color-black: #1f1f1f;
   --personal-color-periwinkle: #e6e7f4;
 }
 
@@ -11,6 +11,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "SUIT", sans-serif;
 }
 
 /* 
@@ -22,7 +23,7 @@
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  background-image: url(/public/logo.png);
+  background-image: url(/public/icons/logo.png);
   border-radius: 50%;
 }
 
@@ -31,5 +32,54 @@
 */
 .title {
   color: var(--personal-color-blue);
-  font-size: 24px;
+  font-size: 20px;
+  font-family: "SUIT", sans-serif;
+  font-weight: 900;
+}
+
+/* 폰트 모음 */
+@font-face {
+  font-family: "SUIT";
+  font-weight: 100;
+  src: url("/assets/fonts/SUIT-Thin.woff2") format("woff2");
+}
+@font-face {
+  font-family: "SUIT";
+  font-weight: 200;
+  src: url("/assets/fonts/SUIT-ExtraLight.woff2") format("woff2");
+}
+@font-face {
+  font-family: "SUIT";
+  font-weight: 300;
+  src: url("/assets/fonts/SUIT-Light.woff2") format("woff2");
+}
+@font-face {
+  font-family: "SUIT";
+  font-weight: 400;
+  src: url("/assets/fonts/SUIT-Regular.woff2") format("woff2");
+}
+@font-face {
+  font-family: "SUIT";
+  font-weight: 500;
+  src: url("/assets/fonts/SUIT-Medium.woff2") format("woff2");
+}
+@font-face {
+  font-family: "SUIT";
+  font-weight: 600;
+  src: url("/assets/fonts/SUIT-SemiBold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "SUIT";
+  font-weight: 700;
+  src: url("/assets/fonts/SUIT-Bold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "SUIT";
+  font-weight: 800;
+  src: url("/assets/fonts/SUIT-ExtraBold.woff2") format("woff2");
+}
+@font-face {
+  font-family: "SUIT";
+  font-weight: 900;
+  src: url("/assets/fonts/SUIT-Heavy.woff2") format("woff2");
 }

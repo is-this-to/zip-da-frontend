@@ -1,36 +1,45 @@
+import axios from "axios";
+import { useAuthStore } from "../store/auth/useAuthStore";
+import { jwtDecode } from "jwt-decode";
+import dayjs from "dayjs";
 
-  // axios 라이브러리 가져오기
-import axios from 'axios';
-
-// 공통 axios 인스턴스 생성
 const myAxios = axios.create({
-  // 백엔드 기본 주소
-  baseURL: 'http://localhost:8080',
-
-  // refreshToken 쿠키를 주고받아야 할 수 있어서 true
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  headers: {
+    // 클라이언트가 보내는 데이터 타입 json이다
+    "Content-Type": "application/json",
+  },
   withCredentials: true,
 });
 
-// 요청을 보내기 전에 실행되는 인터셉터
-myAxios.interceptors.request.use(
-  (config) => {
-    // localStorage에서 accessToken 꺼내기
-    const accessToken = localStorage.getItem('accessToken');
+// reissue 요청 제외하고 클라이언트가 request를 보낼때 accesstoken을 헤더에 넣어서 보내도록함
+// myAxios가 서버에 요청 보내기 전에 실행하는 함수 정의
+// config: axios 요청 보낼때 들어가 있는 모든 정보를 모은 객체
+myAxios.interceptors.request.use(async (config) => {
+  const authStore = useAuthStore();
+  let accessToken = authStore.accessToken;
+  const denyUrl = /^\/api\/auth\/tokes$/; // reissue 요청일 경우 요청 금지
 
-    // accessToken이 있으면 Authorization 헤더에 넣기
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+  if (!denyUrl.test(config.url) && authStore.isLoggedIn) {
+    // 액세스 토큰 만료 확인
+    const claims = jwtDecode(accessToken);
+    // 현재 시간 유닉스 타임스탬프로 변환
+    const now = dayjs().unix();
+    // claims의 exp를 dayjs unix에 맞게 포멧
+    const extTime = dayjs.unix(claims.exp).add(-2, "minute").unix();
+    if (now >= extTime) {
+      try {
+        await authStore.reissue();
+        accessToken = authStore.accessToken;
+      } catch (error) {
+        throw error;
+      }
     }
-
-    // 수정된 요청 설정 반환
-    return config;
-  },
-
-  (error) => {
-    // 요청 보내기 전 에러가 나면 거절
-    return Promise.reject(error);
   }
-);
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return config;
+});
 
-// 다른 파일에서 쓸 수 있게 내보내기
 export default myAxios;
