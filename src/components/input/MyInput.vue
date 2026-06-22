@@ -1,51 +1,51 @@
 <script setup>
-import { computed } from 'vue';
+import { computed } from "vue";
 
 const model = defineModel();
 const isShowPassword = defineModel("isShowPassword");
 
 const props = defineProps({
-  inputType:{
+  inputType: {
     type: String,
-    default: "text"
+    default: "text",
   },
   required: {
     type: Boolean,
-    default: false
+    default: false,
   },
   content: String,
   placeholder: String,
   authComplete: String,
   backgroundColor: String,
-  isPassWord : {
+  isPassWord: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 
 const resultInputType = computed(() => {
-  if(!props.isPassWord) return props.inputType;
+  if (!props.isPassWord) return props.inputType;
   return isShowPassword.value ? "text" : "password";
-}) 
-
+});
 </script>
 
 <template>
   <label class="field-group">
-    <span>{{ props.content }}</span>
+    <span :class="{ required: props.required }">{{ props.content }}</span>
     <div class="input-field">
       <input
         v-model="model"
         :type="resultInputType"
         :autocomplete="props.authComplete"
         :placeholder="props.placeholder"
-        :required =  "props.required"
+        :required="props.required"
       />
-      <button 
-        type="button" 
-        v-if="isPassWord" 
+      <button
+        type="button"
+        v-if="isPassWord"
         @click="isShowPassword = !isShowPassword"
-        >{{ isShowPassword ? "숨김" : "보기" }}
+      >
+        {{ isShowPassword ? "숨김" : "보기" }}
       </button>
     </div>
   </label>
@@ -65,6 +65,10 @@ const resultInputType = computed(() => {
   font-weight: 800;
 }
 
+.field-group > span.required {
+  color: #e73431cb;
+}
+
 .field-group input {
   width: 100%;
   height: 48px;
@@ -74,7 +78,10 @@ const resultInputType = computed(() => {
   padding: 0 18px;
   color: #101828;
   font-size: 16px;
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
   background: #ffffff;
 }
 
