@@ -18,7 +18,7 @@ const myAxios = axios.create({
 myAxios.interceptors.request.use(async (config) => {
   const authStore = useAuthStore();
   let accessToken = authStore.accessToken;
-  const denyUrl = /^\/api\/auth\/tokes$/; // reissue 요청일 경우 요청 금지
+  const denyUrl = /^\/api\/auth\/tokens$/; // reissue 요청일 경우 요청 금지
 
   if (!denyUrl.test(config.url) && authStore.isLoggedIn) {
     // 액세스 토큰 만료 확인

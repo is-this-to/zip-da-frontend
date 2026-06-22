@@ -1,7 +1,6 @@
-
 <script setup>
-import { onMounted, ref } from 'vue';
-import { getMyBookmarkList } from '../../api/bookmarkApi';
+import { onMounted, ref } from "vue";
+import { getMyBookmarkList } from "../../api/bookmarkApi";
 
 const bookmarkList = ref([]);
 const isLoading = ref(false);
@@ -13,7 +12,7 @@ const fetchBookmarkList = async () => {
 
     bookmarkList.value = result.data ?? [];
   } catch (error) {
-    console.error('찜 목록 조회 실패:', error);
+    console.error("찜 목록 조회 실패:", error);
     bookmarkList.value = [];
   } finally {
     isLoading.value = false;
@@ -23,11 +22,17 @@ const fetchBookmarkList = async () => {
 onMounted(() => {
   fetchBookmarkList();
 });
-
 </script>
 
 <template>
   <section class="bookmark-page">
+    <RouterLink
+      to="/mypage"
+      class="bookmark-page"
+      aria-label="마이페이지로 이동"
+    >
+      <strong>ZIPDA</strong>
+    </RouterLink>
     <!-- 제목 -->
     <h2>찜 목록</h2>
 
@@ -35,9 +40,7 @@ onMounted(() => {
     <p v-if="isLoading">찜 목록을 불러오는 중입니다...</p>
 
     <!-- 로딩 끝났고 찜 목록이 없을 때 -->
-    <p v-else-if="bookmarkList.length === 0">
-      찜한 매물이 없습니다.
-    </p>
+    <p v-else-if="bookmarkList.length === 0">찜한 매물이 없습니다.</p>
 
     <!-- 찜 목록이 있을 때 -->
     <div v-else class="bookmark-list">
@@ -59,27 +62,20 @@ onMounted(() => {
             {{ bookmark.propertyType }} / {{ bookmark.transactionType }}
           </p>
 
-          <p class="price">
-            가격 {{ bookmark.price }}
-          </p>
+          <p class="price">가격 {{ bookmark.price }}</p>
 
           <p class="rent">
             보증금 {{ bookmark.deposit }} / 월세 {{ bookmark.monthlyRent }}
           </p>
 
-          <p class="detail">
-            {{ bookmark.areaM2 }}㎡ · {{ bookmark.floor }}층
-          </p>
+          <p class="detail">{{ bookmark.areaM2 }}㎡ · {{ bookmark.floor }}층</p>
 
-          <p class="maintenance">
-            관리비 {{ bookmark.maintenanceFee }}
-          </p>
+          <p class="maintenance">관리비 {{ bookmark.maintenanceFee }}</p>
         </div>
       </div>
     </div>
   </section>
 </template>
-
 
 <style scoped>
 .bookmark-page {

@@ -3,6 +3,8 @@ import { useAuthStore } from "../store/auth/useAuthStore.js";
 import Main from "../views/main/Main.vue";
 import SignIn from "../views/auth/SignIn.vue";
 import SignUp from "../views/auth/SignUp.vue";
+import MyPage from "../views/mypage/MyPage.vue";
+import MyBookmarkList from "../views/mypage/MyBookmarkList.vue";
 
 const ROLE = {
   USER: "USER",
@@ -39,6 +41,16 @@ const routes = [
     path: "/sign-up",
     component: SignUp,
     meta: setMeta(false, true),
+  },
+  {
+    path: "/mypage",
+    component: MyPage,
+    meta: setMeta(true, false),
+  },
+  {
+    path: "/mypage/bookmarks",
+    component: MyBookmarkList,
+    meta: setMeta(true, false),
   },
 ];
 
