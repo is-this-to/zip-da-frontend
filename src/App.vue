@@ -6,6 +6,6 @@ const authStore = useAuthStore();
 </script>
 
 <template>
-  <Header v-if="authStore.authInitialized" />
+  <Header v-if="authStore.authInitialized && authStore.role !== 'ADMIN'" />
   <router-view></router-view>
 </template>

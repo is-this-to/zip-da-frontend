@@ -2,10 +2,9 @@
 import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import MyButton from "../../components/button/MyButton.vue";
 
-
 const intro = reactive({
   eyebrow: "일반 사용자부터 공인중개사까지, 누구나 쉽고 안전하게.",
-  body: "원하는 집을 한눈에 살펴보고\n마음에 드는 매물을 한 곳에서 관리하세요.\n복잡한 부동산 탐색을 더 쉽고 투명하게,\nJIPDA가 당신의 다음 주거공간을 찾는 방식을 바꿔드립니다."
+  body: "원하는 집을 한눈에 살펴보고\n마음에 드는 매물을 한 곳에서 관리하세요.\n복잡한 부동산 탐색을 더 쉽고 투명하게,\nJIPDA가 당신의 다음 주거공간을 찾는 방식을 바꿔드립니다.",
 });
 
 // 찜 많은 매물 탑3 데이터 받아오면 될듯
@@ -40,22 +39,26 @@ const benefitCards = ref([
   {
     number: "01",
     title: "조건별 매물 탐색",
-    description: "지역, 거래 유형, 가격, 옵션을 기준으로 원하는 매물을 빠르게 찾아보세요.",
+    description:
+      "지역, 거래 유형, 가격, 옵션을 기준으로 원하는 매물을 빠르게 찾아보세요.",
   },
   {
     number: "02",
     title: "관심 매물 관리",
-    description: "마음에 드는 매물을 모아두고 가격, 위치, 조건을 차분히 비교하세요.",
+    description:
+      "마음에 드는 매물을 모아두고 가격, 위치, 조건을 차분히 비교하세요.",
   },
   {
     number: "03",
     title: "직접 매물 등록",
-    description: "회원이라면 누구나 사진과 옵션을 담아 직접 매물을 등록할 수 있어요.",
+    description:
+      "회원이라면 누구나 사진과 옵션을 담아 직접 매물을 등록할 수 있어요.",
   },
   {
     number: "04",
     title: "신고와 검토",
-    description: "의심되는 매물은 신고하고, 관리자는 접수된 신고를 확인해 처리할 수 있어요.",
+    description:
+      "의심되는 매물은 신고하고, 관리자는 접수된 신고를 확인해 처리할 수 있어요.",
   },
 ]);
 
@@ -105,19 +108,21 @@ const setRevealRef = (element) => {
 
 onMounted(() => {
   // 스크롤 감시 객체를 만듦
-  observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      // 감시 중인 DOM이 화면에 들어오면 true
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        // 감시 해재
-        observer.unobserve(entry.target);
-      }
-    });
-  }, // DOM의 20프로 이상이 화면에 들어왔을때 콜백을 실행하라
-  {
-    threshold: 0.2,
-  });
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        // 감시 중인 DOM이 화면에 들어오면 true
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          // 감시 해재
+          observer.unobserve(entry.target);
+        }
+      });
+    }, // DOM의 25프로 이상이 화면에 들어왔을때 콜백을 실행하라
+    {
+      threshold: 0.25,
+    },
+  );
   // setRevealRef로 모아둔 DOM을 observer에 등록 -> DOM이 viewport안에 들어오는지 계속 감시
   revealDoms.value.forEach((element) => {
     observer.observe(element);
@@ -136,25 +141,41 @@ onBeforeUnmount(() => {
   <main class="main-page">
     <section class="hero-section" aria-label="JIPDA 소개">
       <div class="hero-copy reveal" :ref="setRevealRef">
-        <h1>JIPDA</h1>
+        <h1>ZIPDA</h1>
         <p>당신의 완벽한 주거공간을 찾아서</p>
       </div>
     </section>
 
-    <section class="intro-section reveal" :ref="setRevealRef" aria-label="서비스 소개">
+    <section
+      class="intro-section reveal"
+      :ref="setRevealRef"
+      aria-label="서비스 소개"
+    >
       <p class="intro-eyebrow">{{ intro.eyebrow }}</p>
       <h2>{{ intro.body }}</h2>
     </section>
 
-    <section class="stats-section reveal" :ref="setRevealRef" aria-label="서비스 통계">
+    <section
+      class="stats-section reveal"
+      :ref="setRevealRef"
+      aria-label="서비스 통계"
+    >
       <article v-for="stat in stats" :key="stat.label" class="stat-item">
         <strong>{{ stat.value }}</strong>
         <span>{{ stat.label }}</span>
       </article>
     </section>
 
-    <section class="benefit-section reveal" :ref="setRevealRef" aria-label="주요 기능">
-      <article v-for="card in benefitCards" :key="card.number" class="benefit-card">
+    <section
+      class="benefit-section reveal"
+      :ref="setRevealRef"
+      aria-label="주요 기능"
+    >
+      <article
+        v-for="card in benefitCards"
+        :key="card.number"
+        class="benefit-card"
+      >
         <span>{{ card.number }}</span>
         <h3>{{ card.title }}</h3>
         <p>{{ card.description }}</p>
@@ -197,7 +218,7 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section class="owner-section " aria-label="매물 등록 안내">
+    <section class="owner-section" aria-label="매물 등록 안내">
       <div class="owner-copy reveal" :ref="setRevealRef">
         <span>For owners</span>
         <h2>직접 매물을 올려보세요</h2>
@@ -219,7 +240,11 @@ onBeforeUnmount(() => {
         />
 
         <div class="floating-cards reveal" :ref="setRevealRef">
-          <article v-for="card in ctaCards" :key="card.title" class="floating-card">
+          <article
+            v-for="card in ctaCards"
+            :key="card.title"
+            class="floating-card"
+          >
             <span></span>
             <div>
               <h3>{{ card.title }}</h3>
@@ -230,7 +255,11 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section class="property-section reveal" :ref="setRevealRef" aria-label="추천 매물">
+    <section
+      class="property-section reveal"
+      :ref="setRevealRef"
+      aria-label="추천 매물"
+    >
       <div class="section-heading">
         <span>Recommended homes</span>
         <h2>지금 눈여겨볼 매물</h2>
@@ -260,7 +289,6 @@ onBeforeUnmount(() => {
         ></MyButton>
       </div>
     </section>
-
   </main>
 </template>
 
@@ -284,7 +312,11 @@ onBeforeUnmount(() => {
   padding: 34px 60px;
   color: var(--personal-color-black);
   background:
-    radial-gradient(circle at 15% 0%, rgba(230, 231, 244, 0.78), transparent 30%),
+    radial-gradient(
+      circle at 15% 0%,
+      rgba(230, 231, 244, 0.78),
+      transparent 30%
+    ),
     linear-gradient(180deg, #ffffff 0%, #f8f9fc 48%, #ffffff 100%);
 }
 
@@ -297,7 +329,12 @@ onBeforeUnmount(() => {
   padding: 42px 64px 76px;
   border-radius: 42px;
   background:
-    linear-gradient(90deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.2) 46%, rgba(0, 0, 0, 0.02) 100%),
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.72) 0%,
+      rgba(0, 0, 0, 0.2) 46%,
+      rgba(0, 0, 0, 0.02) 100%
+    ),
     url("https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=2200&q=90")
       center / cover;
   box-shadow: 0 28px 90px rgba(0, 0, 0, 0.13);
@@ -479,7 +516,7 @@ onBeforeUnmount(() => {
 
 .blue-pill:hover {
   transition: 0.3s;
-  transform: scale(1.04)
+  transform: scale(1.04);
 }
 
 .benefit-section {
@@ -498,7 +535,11 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   padding: 34px;
   border-radius: 32px;
-  background: linear-gradient(145deg, #f6f9ff 0%, var(--personal-color-periwinkle) 100%);
+  background: linear-gradient(
+    145deg,
+    #f6f9ff 0%,
+    var(--personal-color-periwinkle) 100%
+  );
 }
 
 .benefit-card span {
@@ -571,7 +612,11 @@ onBeforeUnmount(() => {
   margin: 0 auto 120px;
   padding: 70px;
   border-radius: 42px;
-  background: linear-gradient(135deg, #f3f8ff 0%, var(--personal-color-periwinkle) 100%);
+  background: linear-gradient(
+    135deg,
+    #f3f8ff 0%,
+    var(--personal-color-periwinkle) 100%
+  );
   margin-top: 60px;
 }
 
@@ -625,7 +670,12 @@ onBeforeUnmount(() => {
   border-radius: 34px;
   background:
     linear-gradient(45deg, rgba(0, 100, 255, 0.12) 0 8%, transparent 8% 100%),
-    linear-gradient(135deg, transparent 0 44%, rgba(0, 100, 255, 0.14) 44% 48%, transparent 48% 100%),
+    linear-gradient(
+      135deg,
+      transparent 0 44%,
+      rgba(0, 100, 255, 0.14) 44% 48%,
+      transparent 48% 100%
+    ),
     #edf4fc;
 }
 
@@ -752,7 +802,11 @@ onBeforeUnmount(() => {
   flex: 0 0 auto;
   border-radius: 50%;
   background:
-    radial-gradient(circle at center, var(--personal-color-white) 0 28%, transparent 29%),
+    radial-gradient(
+      circle at center,
+      var(--personal-color-white) 0 28%,
+      transparent 29%
+    ),
     var(--personal-color-blue);
 }
 
@@ -901,8 +955,6 @@ onBeforeUnmount(() => {
     margin: 72px auto 56px;
   }
 
-
-
   .property-grid {
     display: flex;
     flex-direction: column;
@@ -950,6 +1002,3 @@ onBeforeUnmount(() => {
   }
 }
 </style>
-
-
-
