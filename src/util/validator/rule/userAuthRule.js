@@ -83,3 +83,27 @@ export const phone = (val) => {
     return "휴대폰 번호 형식이 올바르지 않습니다.";
   }
 };
+
+export const adminCode = (adminCode) => {
+  if (!adminCode) {
+    return "코드는 필수입니다.";
+  }
+
+  if (adminCode.length < 4 || adminCode.length > 20) {
+    return "관리자 코드 형식에 맞지 않습니다.";
+  }
+
+  return "";
+};
+
+export const adminPassword = (adminPassword) => {
+  if (!adminPassword) {
+    return "코드는 필수입니다.";
+  }
+
+  if (adminPassword.length < 4 || adminPassword.length > 20) {
+    return "관리자 코드 형식에 맞지 않습니다.";
+  }
+
+  return "";
+};

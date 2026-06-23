@@ -6,28 +6,28 @@ import { jwtDecode } from "jwt-decode";
 export const useAuthStore = defineStore("authStore", () => {
   // 1. State
   const isLoggedIn = ref(false);
-  const accessToken = ref('');
+  const accessToken = ref("");
   const userInfo = ref(null);
   const authInitialized = ref(false);
 
   // 2. Getters
   const role = computed(() => {
-    if(!accessToken.value) {
+    if (!accessToken.value) {
       return null;
     }
     try {
       return jwtDecode(accessToken.value).role;
-    } catch(error) {
+    } catch (error) {
       return null;
     }
-  })
-  
+  });
+
   // 3. Actions
   const clearAuthStore = () => {
     isLoggedIn.value = false;
-    accessToken.value = '';
+    accessToken.value = "";
     userInfo.value = null;
-  }
+  };
 
   const login = async (loginForm) => {
     try {
@@ -38,17 +38,16 @@ export const useAuthStore = defineStore("authStore", () => {
       accessToken.value = data.accessToken;
       userInfo.value = data.principal;
       isLoggedIn.value = true;
-      
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   const reissue = async () => {
     try {
       const url = "/api/auth/tokens";
       const res = await myAxios.post(url);
-      const data = res.data.data
+      const data = res.data.data;
       accessToken.value = data.accessToken;
       userInfo.value = data.principal;
       isLoggedIn.value = true;
@@ -59,7 +58,7 @@ export const useAuthStore = defineStore("authStore", () => {
     } finally {
       authInitialized.value = true;
     }
-  }
+  };
 
   const logout = async () => {
     try {
@@ -70,17 +69,41 @@ export const useAuthStore = defineStore("authStore", () => {
     } finally {
       clearAuthStore();
     }
-  }
+  };
 
   const registration = async (newUserData) => {
     try {
-      const url = "/api/users"
+      const url = "/api/users";
       const res = await myAxios.post(url, newUserData);
       return;
     } catch (error) {
-      throw error; 
+      throw error;
     }
-  }
+  };
+
+  const adminLogin = async (adminLoginForm) => {
+    try {
+      const url = "/api/admin/auth/sessions";
+      const res = await myAxios.post(url, adminLoginForm);
+
+      accessToken.value = res.data.data.accessToken;
+      userInfo.value = res.data.data.principal;
+      isLoggedIn.value = true;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const adminLogout = async () => {
+    try {
+      const url = "/api/admin/auth/sessions";
+      const res = await myAxios.delete(url);
+    } catch (error) {
+      throw error;
+    } finally {
+      clearAuthStore();
+    }
+  };
 
   return {
     // State
@@ -88,7 +111,7 @@ export const useAuthStore = defineStore("authStore", () => {
     accessToken,
     userInfo,
     authInitialized,
-    
+
     // Getter
     role,
 
@@ -96,6 +119,7 @@ export const useAuthStore = defineStore("authStore", () => {
     login,
     reissue,
     logout,
-    registration
-  }
+    registration,
+    adminLogin,
+  };
 });
