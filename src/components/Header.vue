@@ -10,41 +10,40 @@ const authStore = useAuthStore();
 
 const guestNavItems = [
   {
-    content:"매물 조회",
+    content: "매물 조회",
     // 후에 router push할때 사용
-    path: "/"
-  }, 
+    path: "/properties",
+  },
   {
     content: "공인중개사 페이지",
-    path: "/"
-  }
+    path: "/",
+  },
 ];
 
 const userNavItems = [
   {
-    content:"매물 조회",
+    content: "매물 조회",
     // 후에 router push할때 사용
-    path: "/"
-  }, 
+    path: "/",
+  },
   {
     content: "매물 등록",
-    path: "/"
+    path: "/",
   },
   {
     content: "공인중개사 페이지",
-    path: "/"
-  }
+    path: "/",
+  },
 ];
 
 const redirectLogin = () => {
-  router.push('sign-in')
-}
+  router.push("sign-in");
+};
 const redirectMain = () => {
-  router.push('main');
-}
+  router.push("main");
+};
 
 const { isLoggedIn } = storeToRefs(authStore);
-
 </script>
 
 <template>
@@ -54,19 +53,21 @@ const { isLoggedIn } = storeToRefs(authStore);
       <div class="title">ZIPDA</div>
     </div>
     <div class="nav-bar">
-      <RouterLink v-for="item in guestNavItems"
+      <RouterLink
+        v-for="item in guestNavItems"
         :key="item.content"
         class="nav-item"
         :to="item.path"
         v-if="!isLoggedIn"
-      >{{ item.content }}
+        >{{ item.content }}
       </RouterLink>
-      <RouterLink v-for="item in userNavItems"
+      <RouterLink
+        v-for="item in userNavItems"
         :key="item.content"
         class="nav-item"
         :to="item.path"
         v-if="isLoggedIn"
-      >{{ item.content }}
+        >{{ item.content }}
       </RouterLink>
     </div>
     <div class="btn-box">
@@ -111,14 +112,16 @@ const { isLoggedIn } = storeToRefs(authStore);
   display: flex;
   gap: 10px;
 }
-.btn-login, .btn-myPage {
+.btn-login,
+.btn-myPage {
   border: none;
   font-weight: 600;
   color: var(--personal-color-blue);
   cursor: pointer;
 }
 
-.btn-login:hover, .btn-myPage:hover {
+.btn-login:hover,
+.btn-myPage:hover {
   transition: 0.3s;
   color: var(--personal-color-black);
 }
@@ -145,7 +148,8 @@ const { isLoggedIn } = storeToRefs(authStore);
 }
 
 @media (max-width: 700px) {
-  .title, .title-box {
+  .title,
+  .title-box {
     display: none;
   }
 }
