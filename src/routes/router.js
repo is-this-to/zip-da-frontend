@@ -6,7 +6,7 @@ import SignUp from "../views/auth/SignUp.vue";
 import AdminSignIn from "../views/auth/AdminSignIn.vue";
 import Admin from "../views/admin/Admin.vue";
 import { USER_ROLE } from "../constants/role.js";
-import PropertySearch from "../pages/property/PropertySearch.vue";
+import PropertySearch from "../views/property/PropertySearch.vue";
 
 // 팀원 각자파트 권한을 나눠서 routes 컴포넌트 경로 적어주세요
 const setMeta = (requiresAuth, guestOnly, roles = []) => {
