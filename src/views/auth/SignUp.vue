@@ -18,7 +18,7 @@ const signUpForm = reactive({
   passwordCk: null,
   name: null,
   nick: null,
-  phone: null
+  phone: null,
 });
 
 // 보기 눌러서 비밀번호 보이게 해주는 변수
@@ -33,45 +33,59 @@ const submitSignup = async () => {
   // 유효성 검사
   const emailValResult = signUpValidator.email(signUpForm.email);
   const passwordValResult = signUpValidator.password(signUpForm.password);
-  const passwordCkValResult = signUpValidator.passwordCk(signUpForm.password, signUpForm.passwordCk);
+  const passwordCkValResult = signUpValidator.passwordCk(
+    signUpForm.password,
+    signUpForm.passwordCk,
+  );
   const nameValResult = signUpValidator.name(signUpForm.name);
   const nickValResult = signUpValidator.nick(signUpForm.nick);
   const phoneValResult = signUpValidator.phone(signUpForm.phone);
   // 유효성 성공하면 if절
-  if(!emailValResult && !passwordValResult && !passwordCkValResult && !nameValResult && !nickValResult && !phoneValResult) {
+  if (
+    !emailValResult &&
+    !passwordValResult &&
+    !passwordCkValResult &&
+    !nameValResult &&
+    !nickValResult &&
+    !phoneValResult
+  ) {
     try {
       isSubmitting.value = true;
       errorMessage.value = "";
       await authStore.registration(signUpForm);
       router.replace("/sign-in");
     } catch (error) {
-      if(error.response) {
-        errorMessage.value(error.response.data.data)
+      if (error.response) {
+        errorMessage.value =
+          error.response.data.data ||
+          "회원가입에 실패했습니다. 다시 시도해주세요.";
       }
     } finally {
       isSubmitting.value = false;
     }
-  }
-  else {
+  } else {
     const validationMessages = [
       emailValResult,
       passwordValResult,
       passwordCkValResult,
       nameValResult,
       nickValResult,
-      phoneValResult
+      phoneValResult,
     ].filter(Boolean);
     errorMessage.value = validationMessages.join("\n");
   }
 };
-
 </script>
 
 <template>
   <main class="signup-page">
     <section class="signup-shell">
       <div class="brand-panel">
-        <RouterLink to="/main" class="brand-mark" aria-label="집다 메인으로 이동">
+        <RouterLink
+          to="/main"
+          class="brand-mark"
+          aria-label="집다 메인으로 이동"
+        >
           <strong>ZIPDA</strong>
         </RouterLink>
 
@@ -79,7 +93,8 @@ const submitSignup = async () => {
           <p class="eyebrow">Welcome</p>
           <h1>좋은 집을 찾는 여정을<br />시작하세요.</h1>
           <p>
-            회원가입하고 관심 매물 저장, 검색 조건 관리, 매물 등록까지 JIPDA에서 시작하세요.
+            회원가입하고 관심 매물 저장, 검색 조건 관리, 매물 등록까지 JIPDA에서
+            시작하세요.
           </p>
         </div>
       </div>
@@ -140,7 +155,7 @@ const submitSignup = async () => {
 
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         <MyButton
-          :content='isSubmitting ? "회원가입 중..." : "회원가입" '
+          :content="isSubmitting ? '회원가입 중...' : '회원가입'"
           :color="'blue'"
           :size="'middle'"
           :class="'submit-button'"
@@ -154,8 +169,12 @@ const submitSignup = async () => {
         </div>
 
         <div class="social-grid">
-          <button type="button" class="kakao-button" @click="notYet">Kakao</button>
-          <button type="button" class="naver-button" @click="notYet">Naver</button>
+          <button type="button" class="kakao-button" @click="notYet">
+            Kakao
+          </button>
+          <button type="button" class="naver-button" @click="notYet">
+            Naver
+          </button>
         </div>
 
         <p class="signup-copy">
@@ -176,7 +195,7 @@ const submitSignup = async () => {
   color: #121826;
   background:
     radial-gradient(circle at 22% 18%, #ff624d33, transparent 30%),
-    radial-gradient(circle at 76% 82%, #0064ff2e , transparent 28%),
+    radial-gradient(circle at 76% 82%, #0064ff2e, transparent 28%),
     linear-gradient(135deg, #eef3ff 0%, #f8fbff 46%, #eef2f8 100%);
 }
 

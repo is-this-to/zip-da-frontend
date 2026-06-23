@@ -3,13 +3,10 @@ import { useAuthStore } from "../store/auth/useAuthStore.js";
 import Main from "../views/main/Main.vue";
 import SignIn from "../views/auth/SignIn.vue";
 import SignUp from "../views/auth/SignUp.vue";
-import PropertySearch from "../pages/property/PropertySearch.vue";
-
-const ROLE = {
-  USER: "USER",
-  AGENT: "AGENT",
-  ADMIN: "ADMIN",
-};
+import AdminSignIn from "../views/auth/AdminSignIn.vue";
+import Admin from "../views/admin/Admin.vue";
+import { USER_ROLE } from "../constants/role.js";
+import PropertySearch from "../views/property/PropertySearch.vue";
 
 // 팀원 각자파트 권한을 나눠서 routes 컴포넌트 경로 적어주세요
 const setMeta = (requiresAuth, guestOnly, roles = []) => {
@@ -36,7 +33,6 @@ const routes = [
     component: PropertySearch,
     meta: setMeta(false, false),
   },
-
   {
     path: "/sign-in",
     component: SignIn,
@@ -46,6 +42,16 @@ const routes = [
     path: "/sign-up",
     component: SignUp,
     meta: setMeta(false, true),
+  },
+  {
+    path: "/admin",
+    component: Admin,
+    meta: setMeta(true, false, [USER_ROLE.ADMIN]),
+  },
+  {
+    path: "/admin-sign-in",
+    component: AdminSignIn,
+    meta: setMeta(false, false),
   },
 ];
 
@@ -68,23 +74,27 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  // 1. guestOnly 페이지
-  // 로그인, 회원가입처럼 "비회원만" 들어갈 수 있는 페이지
+  // 로그인, 회원가입처럼 "비회원만" 들어갈 수 있는 페이지를 들어갈때
   if (to.meta.guestOnly && authStore.isLoggedIn) {
     return next("/");
   }
 
-  // 2. 로그인이 필요한 페이지인데 로그인 안 한 경우
+  // admin 권한이 필요한 페이지로 가는데 role이 admin이 아닌경우
+  if (to.meta.roles.includes(USER_ROLE.ADMIN) && role != USER_ROLE.ADMIN) {
+    return next("/admin-sign-in");
+  }
+
+  // 로그인이 필요한 페이지인데 로그인 안 한 경우
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     return next("/sign-in");
   }
 
-  // 3. 중개사 권한이 필요한데 중개사 권한이 없는 경우
-  if (to.meta.roles.includes(ROLE.AGENT) && role != ROLE.AGENT) {
+  // 중개사 권한이 필요한데 중개사 권한이 없는 경우
+  if (to.meta.roles.includes(USER_ROLE.AGENT) && role != USER_ROLE.AGENT) {
     // -------- 공인중개사 인증 페이지로 이동 -> 나중에 추가 예정
   }
 
-  // 4. 특정 권한이 필요한데 없는 경우 메인페이지로 이동
+  //특정 권한이 필요한데 없는 경우 메인페이지로 이동
   if (to.meta.roles.length > 0 && !to.meta.roles.includes(role)) {
     return next("/");
   }
