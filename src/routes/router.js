@@ -3,8 +3,15 @@ import { useAuthStore } from "../store/auth/useAuthStore.js";
 import Main from "../views/main/Main.vue";
 import SignIn from "../views/auth/SignIn.vue";
 import SignUp from "../views/auth/SignUp.vue";
+
 import MyPage from "../views/mypage/MyPage.vue";
+import MyProfile from "../views/mypage/MyProfile.vue";
 import MyBookmarkList from "../views/mypage/MyBookmarkList.vue";
+import MyPostList from "../views/mypage/MyPostList.vue";
+import MyReportList from "../views/mypage/MyReportList.vue";
+
+import PropertySearch from "../views/property/PropertySearch.vue";
+import PropertyShow from "../views/property/PropertyShow.vue";
 
 const ROLE = {
   USER: "USER",
@@ -46,11 +53,47 @@ const routes = [
     path: "/mypage",
     component: MyPage,
     meta: setMeta(true, false),
+    children: [
+      {
+        path: "",
+        redirect: "/mypage/profile",
+      },
+      {
+        path: "profile",
+        component: MyProfile,
+        meta: setMeta(true, false),
+      },
+      {
+        path: "bookmarks",
+        component: MyBookmarkList,
+        meta: setMeta(true, false),
+      },
+      {
+        path: "posts",
+        component: MyPostList,
+        meta: setMeta(true, false),
+      },
+      {
+        path: "reports",
+        component: MyReportList,
+        meta: setMeta(true, false),
+      },
+    ],
   },
   {
-    path: "/mypage/bookmarks",
-    component: MyBookmarkList,
+    path: "/properties",
+    component: PropertySearch,
+    meta: setMeta(false, false),
+  },
+  {
+    path: "/properties/new",
+    redirect: "/properties",
     meta: setMeta(true, false),
+  },
+  {
+    path: "/properties/:id",
+    component: PropertyShow,
+    meta: setMeta(false, false),
   },
 ];
 

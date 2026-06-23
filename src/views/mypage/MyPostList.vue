@@ -1,131 +1,137 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-import { getMyProperties } from '../../api/mypageApi';
+import { computed, onMounted, ref } from "vue";
+import { getMyProperties } from "../../api/myPageApi";
 
 const posts = ref([]);
 const loading = ref(true);
-const errorMessage = ref('');
-const filter = ref('ALL');
-const filteredPosts = computed(() =>
-  filter.value === 'ALL'
-    ? posts.value
-    : posts.value.filter((item) => item.status === filter.value),
-);
+const errorMessage = ref("");
+const filter = ref("ALL");
+
+const statusFilterList = [
+  { key: "ALL", label: "전체" },
+  { key: "FOR_SALE", label: "게시 중" },
+  { key: "COMPLETED", label: "거래 완료" },
+  { key: "HIDDEN", label: "숨김" },
+];
+
+const filteredPosts = computed(() => {
+  if (filter.value === "ALL") return posts.value;
+  return posts.value.filter((item) => item.status === filter.value);
+});
+
 const counts = computed(() => ({
   ALL: posts.value.length,
-  ACTIVE: posts.value.filter((p) => p.status === 'ACTIVE').length,
-  COMPLETED: posts.value.filter((p) => p.status === 'COMPLETED').length,
-  HIDDEN: posts.value.filter((p) => p.status === 'HIDDEN').length,
+  FOR_SALE: posts.value.filter((p) => p.status === "FOR_SALE").length,
+  COMPLETED: posts.value.filter((p) => p.status === "COMPLETED").length,
+  HIDDEN: posts.value.filter((p) => p.status === "HIDDEN").length,
 }));
+
 const labels = {
-  ACTIVE: '게시 중',
-  COMPLETED: '거래 완료',
-  HIDDEN: '숨김',
-  SALE: '매매',
-  JEONSE: '전세',
-  MONTHLY: '월세',
-  MONTHLY_RENT: '월세',
+  FOR_SALE: "게시 중",
+  COMPLETED: "거래 완료",
+  HIDDEN: "숨김",
+  SALE: "매매",
+  JEONSE: "전세",
+  MONTHLY_RENT: "월세",
+  SHORT_TERM: "단기",
 };
+
 const number = (value) =>
-  new Intl.NumberFormat('ko-KR').format(Number(value || 0));
-const priceText = (item) =>
-  item.transactionType?.includes('MONTHLY')
-    ? `월세 ${number(item.deposit)} / ${number(item.monthlyRent)}`
-    : item.transactionType === 'JEONSE'
-      ? `전세 ${number(item.deposit)}`
-      : `매매 ${number(item.price)}`;
+  new Intl.NumberFormat("ko-KR").format(Number(value || 0));
+
+const priceText = (item) => {
+  if (item.transactionType === "SALE") return `매매 ${number(item.price)}`;
+  if (item.transactionType === "JEONSE") return `전세 ${number(item.deposit)}`;
+  return `월세 ${number(item.deposit)} / ${number(item.monthlyRent)}`;
+};
+
 const loadPosts = async () => {
   try {
+    loading.value = true;
+    errorMessage.value = "";
+
     const result = await getMyProperties();
-    posts.value = Array.isArray(result.data)
-      ? result.data
-      : (result.data?.content ?? []);
+    posts.value = Array.isArray(result.data) ? result.data : [];
   } catch (error) {
     errorMessage.value =
       error.response?.data?.message ||
-      '내 게시물 API가 아직 연결되지 않았습니다.';
+      "내가 올린 게시물 API가 아직 연결되지 않았습니다.";
   } finally {
     loading.value = false;
   }
 };
+
 onMounted(loadPosts);
 </script>
 
 <template>
-  <div class="page-head">
-    <span>MY LISTINGS</span>
-    <h1>내 게시물</h1>
-    <p>내가 등록한 매물과 현재 게시 상태를 확인하세요.</p>
-  </div>
-  <div class="summary-cards">
-    <button
-      v-for="item in [
-        { key: 'ALL', label: '전체' },
-        { key: 'ACTIVE', label: '게시 중' },
-        { key: 'COMPLETED', label: '거래 완료' },
-        { key: 'HIDDEN', label: '숨김' },
-      ]"
-      :key="item.key"
-      :class="{ active: filter === item.key }"
-      @click="filter = item.key"
-    >
-      <span>{{ item.label }}</span
-      ><strong>{{ counts[item.key] }}</strong>
-    </button>
-  </div>
-  <div v-if="loading" class="state">게시물을 불러오는 중입니다…</div>
-  <div v-else-if="errorMessage" class="state error">
-    <b>게시물을 불러오지 못했어요</b>
-    <p>{{ errorMessage }}</p>
-    <button @click="loadPosts">다시 시도</button>
-  </div>
-  <div v-else-if="!filteredPosts.length" class="state">
-    <b>{{
-      filter === 'ALL'
-        ? '등록한 게시물이 없어요'
-        : '해당 상태의 게시물이 없어요'
-    }}</b>
-    <p>새 매물을 등록하면 이곳에서 상태를 관리할 수 있어요.</p>
-    <RouterLink to="/properties/new">매물 등록하기</RouterLink>
-  </div>
-  <div v-else class="post-list">
-    <article
-      v-for="post in filteredPosts"
-      :key="post.propertyId"
-      class="post-card"
-    >
-      <div class="thumb">
-        <img
-          v-if="post.thumbnailUrl"
-          :src="post.thumbnailUrl"
-          :alt="post.title"
-        /><span v-else>ZIPDA</span>
-      </div>
-      <div class="info">
-        <div>
-          <span class="status" :class="post.status?.toLowerCase()">{{
-            labels[post.status] || post.status
-          }}</span
-          ><small>{{ post.regionName }}</small>
+  <section>
+    <div class="page-head">
+      <span>MY LISTINGS</span>
+      <h1>내가 올린 게시물</h1>
+      <p>내가 등록한 매물과 현재 게시 상태를 확인하세요.</p>
+    </div>
+
+    <div class="summary-cards">
+      <button
+        v-for="item in statusFilterList"
+        :key="item.key"
+        :class="{ active: filter === item.key }"
+        type="button"
+        @click="filter = item.key"
+      >
+        <span>{{ item.label }}</span>
+        <strong>{{ counts[item.key] }}</strong>
+      </button>
+    </div>
+
+    <div v-if="loading" class="state">게시물을 불러오는 중입니다…</div>
+
+    <div v-else-if="errorMessage" class="state error">
+      <b>게시물을 불러오지 못했어요</b>
+      <p>{{ errorMessage }}</p>
+      <button type="button" @click="loadPosts">다시 시도</button>
+    </div>
+
+    <div v-else-if="!filteredPosts.length" class="state">
+      <b>{{ filter === "ALL" ? "등록한 게시물이 없어요" : "해당 상태의 게시물이 없어요" }}</b>
+      <p>새 매물을 등록하면 이곳에서 상태를 관리할 수 있어요.</p>
+      <RouterLink to="/properties/new">매물 등록하기</RouterLink>
+    </div>
+
+    <div v-else class="post-list">
+      <article
+        v-for="post in filteredPosts"
+        :key="post.propertyId"
+        class="post-card"
+      >
+        <RouterLink :to="`/properties/${post.propertyId}`" class="thumb">
+          <img v-if="post.thumbnailUrl" :src="post.thumbnailUrl" alt="매물 이미지" />
+          <span v-else>ZIPDA</span>
+        </RouterLink>
+
+        <div class="info">
+          <div>
+            <span class="status" :class="post.status?.toLowerCase()">
+              {{ labels[post.status] || post.status }}
+            </span>
+            <small>{{ post.regionName || "지역 정보 없음" }}</small>
+          </div>
+          <h2>{{ priceText(post) }}</h2>
+          <p>
+            {{ labels[post.transactionType] || post.transactionType }}
+            <template v-if="post.areaM2">· {{ post.areaM2 }}㎡</template>
+          </p>
+          <small>등록일 {{ post.createdAt?.slice(0, 10) || "-" }}</small>
         </div>
-        <h2>{{ post.title || priceText(post) }}</h2>
-        <p>
-          {{ priceText(post) }}
-          <template v-if="post.areaM2">· {{ post.areaM2 }}㎡</template>
-        </p>
-        <small
-          >등록일 {{ post.createdAt?.slice(0, 10) || '-' }} · 조회
-          {{ number(post.viewCount) }}</small
-        >
-      </div>
-      <div class="actions">
-        <RouterLink :to="`/properties/${post.propertyId}`">보기</RouterLink
-        ><RouterLink :to="`/properties/${post.propertyId}/edit`"
-          >수정</RouterLink
-        >
-      </div>
-    </article>
-  </div>
+
+        <div class="actions">
+          <RouterLink :to="`/properties/${post.propertyId}`">보기</RouterLink>
+          <RouterLink :to="`/properties/${post.propertyId}/edit`">수정</RouterLink>
+        </div>
+      </article>
+    </div>
+  </section>
 </template>
 
 <style scoped>
@@ -199,6 +205,7 @@ onMounted(loadPosts);
   color: #9babc3;
   background: #e4eaf3;
   font-weight: 900;
+  text-decoration: none;
 }
 .thumb img {
   width: 100%;
@@ -258,47 +265,37 @@ onMounted(loadPosts);
 }
 .state {
   display: grid;
-  justify-items: center;
-  padding: 80px 20px;
-  border: 1px dashed #d9dfe9;
-  border-radius: 12px;
+  gap: 8px;
+  place-items: center;
+  min-height: 240px;
+  padding: 35px;
+  border: 1px dashed #cbd7ef;
+  border-radius: 14px;
   color: #7b8494;
   background: #fff;
   text-align: center;
 }
-.state b {
-  margin-bottom: 8px;
-  color: #273349;
-  font-size: 18px;
-}
-.state p {
-  margin: 7px 0 18px;
-  font-size: 12px;
-}
 .state a,
 .state button {
-  padding: 10px 15px;
+  padding: 8px 12px;
   border: 0;
-  border-radius: 7px;
+  border-radius: 8px;
   color: #fff;
   background: #0064ff;
   text-decoration: none;
-  font-weight: 800;
-  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
 }
-.state.error b {
-  color: #b42939;
+.state.error {
+  color: #bd2635;
+  background: #fff4f5;
 }
-@media (max-width: 700px) {
+@media (max-width: 760px) {
   .summary-cards {
     grid-template-columns: repeat(2, 1fr);
   }
   .post-card {
-    grid-template-columns: 100px 1fr;
-  }
-  .actions {
-    grid-column: 1 / -1;
-    justify-content: flex-end;
+    grid-template-columns: 1fr;
   }
 }
 </style>

@@ -1,120 +1,135 @@
 <script setup>
-import { useRouter } from "vue-router";
+import { computed } from "vue";
 import { useAuthStore } from "../../store/auth/useAuthStore.js";
+import MyPageNav from "./MyPageNav.vue";
 
-const router = useRouter();
 const authStore = useAuthStore();
 
-const goBookmarkList = () => {
-  router.push("/mypage/bookmarks");
-};
+const displayName = computed(() => {
+  return authStore.userInfo?.nick || authStore.userInfo?.name || "회원";
+});
+
+const roleLabel = computed(() => {
+  return authStore.role === "AGENT" ? "공인중개사" : "일반회원";
+});
 </script>
 
 <template>
-  <main class="mypage">
-    <section class="mypage-header">
-      <h1>마이페이지</h1>
-      <p class="description">
-        {{ authStore.userInfo?.name || authStore.userInfo?.nick || "회원" }}님의
-        정보를 관리하는 공간입니다.
-      </p>
-    </section>
+  <main class="mypage-shell">
+    <aside class="mypage-sidebar">
+      <RouterLink to="/main" class="logo">Zip-da</RouterLink>
 
-    <section class="menu-section" aria-label="마이페이지 메뉴">
-      <button class="menu-card" type="button" @click="goBookmarkList">
-        <span class="menu-icon">♡</span>
+      <div class="member-mini-card">
+        <div class="avatar">{{ displayName.slice(0, 1) }}</div>
         <div>
-          <h2>찜 목록</h2>
-          <p>내가 찜한 매물을 한곳에서 확인합니다.</p>
+          <strong>{{ displayName }}</strong>
+          <span>{{ roleLabel }}</span>
         </div>
-      </button>
-      <button class="menu-card" type="button" @click="goBookmarkList">
-        <span class="menu-icon">♡</span>
-        <div>
-          <h2>내 정보 수정</h2>
-        </div>
-      </button>
+      </div>
+
+      <MyPageNav />
+
+      <RouterLink to="/properties/new" class="post-button">Post New Listing</RouterLink>
+    </aside>
+
+    <section class="mypage-content">
+      <!-- /mypage/profile, /mypage/bookmarks 같은 하위 페이지가 이 자리에 표시됩니다. -->
+      <RouterView />
     </section>
   </main>
 </template>
 
 <style scoped>
-.mypage {
-  min-height: 800px;
-  padding: 60px 100px;
-  background: #f8f9fc;
-  color: var(--personal-color-black);
-}
-
-.mypage-header {
-  max-width: 960px;
-  margin: 10px 20px;
-}
-
-.mypage-header h1 {
-  margin: 0;
-  font-size: 40px;
-  font-weight: 900;
-}
-
-.description {
-  margin: 14px 0 0;
-  color: var(--personal-color-gray);
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.menu-section {
-  max-width: 900px;
-  margin: 0 auto;
+.mypage-shell {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
+  grid-template-columns: 240px minmax(0, 1fr);
+  min-height: calc(100vh - 70px);
+  background: #f7f8fd;
 }
 
-.menu-card {
+.mypage-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  padding: 28px 24px;
+  border-right: 1px solid #e6eaf2;
+  background: #fbfbff;
+}
+
+.logo {
+  display: inline-block;
+  margin-bottom: 34px;
+  color: #0064ff;
+  font-size: 27px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.member-mini-card {
   display: flex;
   align-items: center;
-  gap: 20px;
-  width: 300px;
-  padding: 25px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 20px;
-  background: var(--personal-color-white);
-  text-align: left;
-  cursor: pointer;
-  box-shadow: 0 16px 40px rgba(21, 32, 48, 0.08);
-  transition: 0.2s;
+  gap: 12px;
+  margin-bottom: 28px;
 }
 
-.menu-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 25px 54px rgba(21, 32, 48, 0.14);
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: #0064ff;
+  background: #dbe9ff;
+  font-weight: 900;
 }
 
-.menu-icon {
-  display: inline-flex;
+.member-mini-card strong,
+.member-mini-card span {
+  display: block;
+}
+
+.member-mini-card strong {
+  color: #243149;
+  font-size: 14px;
+}
+
+.member-mini-card span {
+  margin-top: 3px;
+  color: #8b94a4;
+  font-size: 12px;
+}
+
+.post-button {
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 55px;
-  height: 55px;
-  border-radius: 50%;
-  background: var(--personal-color-periwinkle);
-  color: var(--personal-color-blue);
-  font-size: 30px;
+  height: 38px;
+  margin-top: 36px;
+  border-radius: 8px;
+  color: #0064ff;
+  background: #e7efff;
+  font-size: 12px;
   font-weight: 900;
+  text-decoration: none;
 }
 
-.menu-card h2 {
-  margin: 0 0 8px;
-  font-size: 20px;
-  font-weight: 900;
+.mypage-content {
+  width: min(100%, 980px);
+  padding: 54px 56px 90px;
 }
 
-.menu-card p {
-  margin: 0;
-  color: var(--personal-color-gray);
-  font-size: 15px;
-  font-weight: 600;
+@media (max-width: 860px) {
+  .mypage-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .mypage-sidebar {
+    position: static;
+    height: auto;
+  }
+
+  .mypage-content {
+    padding: 32px 18px 70px;
+  }
 }
 </style>

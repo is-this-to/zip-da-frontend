@@ -1,107 +1,64 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '../../store/auth/useAuthStore';
-import { withdrawMembership } from '../../api/mypageApi';
+import { ref } from "vue";
 
-const router = useRouter();
-const authStore = useAuthStore();
-const showModal = ref(false);
-const password = ref('');
-const confirmText = ref('');
-const processing = ref(false);
-const errorMessage = ref('');
-const logout = async () => {
-  try {
-    await authStore.logout();
-  } finally {
-    router.replace('/sign-in');
-  }
-};
-const withdraw = async () => {
-  if (confirmText.value !== '탈퇴합니다') {
-    errorMessage.value = '확인 문구를 정확히 입력해 주세요.';
-    return;
-  }
-  try {
-    processing.value = true;
-    errorMessage.value = '';
-    await withdrawMembership(password.value);
-    authStore.clearAuthStore();
-    showModal.value = false;
-    router.replace('/main');
-  } catch (error) {
-    errorMessage.value =
-      error.response?.data?.message || '회원탈퇴를 처리하지 못했습니다.';
-  } finally {
-    processing.value = false;
-  }
-};
+const passwordModalOpen = ref(false);
+const withdrawModalOpen = ref(false);
 </script>
 
 <template>
   <div class="page-head">
     <span>ACCOUNT</span>
     <h1>계정 관리</h1>
-    <p>로그인 상태와 회원 계정을 안전하게 관리하세요.</p>
+    <p>지금은 버튼 모양만 만든 상태입니다. 실제 기능은 나중에 연결합니다.</p>
   </div>
+
   <section class="account-card">
-    <div class="icon blue">↗</div>
+    <div class="icon blue">↪</div>
     <div>
       <h2>로그아웃</h2>
-      <p>현재 기기에서 ZIPDA 계정 로그인을 종료합니다.</p>
+      <p>로그아웃은 담당자 기능이라서 여기서는 호출하지 않습니다.</p>
     </div>
-    <button class="outline" @click="logout">로그아웃</button>
+    <button class="outline" disabled>로그아웃</button>
   </section>
+
+  <section class="account-card">
+    <div class="icon blue">🔒</div>
+    <div>
+      <h2>비밀번호 변경</h2>
+      <p>비밀번호 변경 화면만 확인할 수 있습니다.</p>
+    </div>
+    <button class="outline" @click="passwordModalOpen = true">변경</button>
+  </section>
+
   <section class="account-card danger-card">
     <div class="icon red">!</div>
     <div>
       <h2>회원탈퇴</h2>
-      <p>
-        탈퇴하면 프로필과 찜 목록을 더 이상 이용할 수 없습니다. 작성한 게시물의
-        처리 정책은 팀의 서버 정책을 따릅니다.
-      </p>
+      <p>회원탈퇴 화면만 확인할 수 있습니다. 실제 API는 아직 호출하지 않습니다.</p>
     </div>
-    <button class="danger" @click="showModal = true">회원탈퇴</button>
+    <button class="danger" @click="withdrawModalOpen = true">회원탈퇴</button>
   </section>
-  <div v-if="showModal" class="modal-backdrop" @click.self="showModal = false">
-    <form class="modal" @submit.prevent="withdraw">
-      <button
-        type="button"
-        class="close"
-        aria-label="닫기"
-        @click="showModal = false"
-      >
-        ×
-      </button>
-      <div class="warning">!</div>
-      <h2>정말 탈퇴하시겠어요?</h2>
-      <p>
-        이 작업은 되돌릴 수 없습니다. 계속하려면 아래에 <b>탈퇴합니다</b>를
-        입력해 주세요.
-      </p>
-      <label
-        ><span>현재 비밀번호</span
-        ><input
-          v-model="password"
-          type="password"
-          autocomplete="current-password"
-          placeholder="서버 정책상 필요한 경우 입력" /></label
-      ><label
-        ><span>확인 문구</span
-        ><input v-model="confirmText" placeholder="탈퇴합니다"
-      /></label>
-      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-      <div class="modal-actions">
-        <button type="button" @click="showModal = false">취소</button
-        ><button
-          class="danger"
-          :disabled="processing || confirmText !== '탈퇴합니다'"
-        >
-          {{ processing ? '처리 중…' : '탈퇴하기' }}
-        </button>
-      </div>
-    </form>
+
+  <div v-if="passwordModalOpen" class="modal-backdrop" @click.self="passwordModalOpen = false">
+    <section class="modal">
+      <button class="close" type="button" @click="passwordModalOpen = false">×</button>
+      <h2>비밀번호 변경</h2>
+      <p>API 연결 전 화면입니다.</p>
+      <input type="password" placeholder="현재 비밀번호" disabled />
+      <input type="password" placeholder="새 비밀번호" disabled />
+      <input type="password" placeholder="새 비밀번호 확인" disabled />
+      <button class="outline full" disabled>변경하기</button>
+    </section>
+  </div>
+
+  <div v-if="withdrawModalOpen" class="modal-backdrop" @click.self="withdrawModalOpen = false">
+    <section class="modal">
+      <button class="close" type="button" @click="withdrawModalOpen = false">×</button>
+      <h2>회원탈퇴</h2>
+      <p>API 연결 전 화면입니다.</p>
+      <input placeholder="탈퇴합니다" disabled />
+      <button class="danger full" disabled>탈퇴하기</button>
+    </section>
   </div>
 </template>
 
@@ -136,13 +93,13 @@ const withdraw = async () => {
 .account-card + .account-card {
   margin-top: 14px;
 }
-.account-card .icon {
+.icon {
   display: grid;
   place-items: center;
   width: 44px;
   height: 44px;
   border-radius: 10px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 900;
 }
 .blue {
@@ -158,21 +115,24 @@ const withdraw = async () => {
   font-size: 16px;
 }
 .account-card p {
-  max-width: 600px;
   color: #7c8595;
   font-size: 12px;
-  line-height: 1.6;
 }
-.account-card button {
+.account-card button,
+.full {
   padding: 9px 13px;
   border-radius: 7px;
-  background: #fff;
   font-weight: 800;
   cursor: pointer;
 }
 .outline {
   border: 1px solid #dce2eb;
   color: #596375;
+  background: #fff;
+}
+.outline:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 .danger-card {
   border-color: #f4d7da;
@@ -180,7 +140,11 @@ const withdraw = async () => {
 .danger {
   border: 1px solid #e24b5d;
   color: #fff;
-  background: #dc3548 !important;
+  background: #dc3548;
+}
+.danger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 .modal-backdrop {
   position: fixed;
@@ -190,102 +154,33 @@ const withdraw = async () => {
   place-items: center;
   padding: 20px;
   background: rgba(24, 34, 51, 0.55);
-  backdrop-filter: blur(3px);
 }
 .modal {
   position: relative;
-  width: min(100%, 460px);
+  width: min(100%, 420px);
   padding: 30px;
   border-radius: 15px;
   background: #fff;
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
 }
 .close {
   position: absolute;
-  top: 15px;
-  right: 17px;
+  top: 12px;
+  right: 15px;
   border: 0;
-  color: #7e8796;
   background: transparent;
   font-size: 24px;
   cursor: pointer;
 }
-.warning {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  margin-bottom: 18px;
-  border-radius: 50%;
-  color: #d62f43;
-  background: #ffedef;
-  font-size: 22px;
-  font-weight: 900;
-}
-.modal h2 {
-  margin-bottom: 9px;
-  font-size: 21px;
-}
-.modal > p {
-  margin-bottom: 20px;
-  color: #757f90;
-  font-size: 13px;
-  line-height: 1.6;
-}
-.modal label {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin-top: 14px;
-}
-.modal label span {
-  color: #5d6676;
-  font-size: 11px;
-  font-weight: 800;
-}
 .modal input {
-  height: 43px;
+  width: 100%;
+  height: 42px;
+  margin-top: 10px;
   padding: 0 12px;
   border: 1px solid #dfe4ec;
   border-radius: 8px;
-  outline: 0;
 }
-.modal input:focus {
-  border-color: #0064ff;
-  box-shadow: 0 0 0 3px rgba(0, 100, 255, 0.1);
-}
-.error-message {
-  margin: 12px 0 0 !important;
-  color: #c22c3e !important;
-}
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 24px;
-}
-.modal-actions button {
-  padding: 10px 16px;
-  border: 0;
-  border-radius: 7px;
-  color: #657082;
-  background: #eef0f4;
-  font-weight: 800;
-  cursor: pointer;
-}
-.modal-actions button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-@media (max-width: 580px) {
-  .account-card {
-    grid-template-columns: 44px 1fr;
-  }
-  .account-card > button {
-    grid-column: 1 / -1;
-  }
-  .modal {
-    padding: 24px;
-  }
+.full {
+  width: 100%;
+  margin-top: 12px;
 }
 </style>
