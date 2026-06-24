@@ -16,7 +16,7 @@ const guestNavItems = [
   },
   {
     content: "공인중개사 페이지",
-    path: "/",
+    path: "/agents",
   },
 ];
 
@@ -32,15 +32,15 @@ const userNavItems = [
   },
   {
     content: "공인중개사 페이지",
-    path: "/",
+    path: "/agents",
   },
 ];
 
 const redirectLogin = () => {
-  router.push("sign-in");
+  router.push("/sign-in");
 };
 const redirectMain = () => {
-  router.push("main");
+  router.push("/main");
 };
 
 const { isLoggedIn } = storeToRefs(authStore);
@@ -117,7 +117,6 @@ const { isLoggedIn } = storeToRefs(authStore);
   border: none;
   font-weight: 600;
   color: var(--personal-color-blue);
-  cursor: pointer;
 }
 
 .btn-login:hover,

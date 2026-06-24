@@ -5,9 +5,11 @@ import SignIn from "../views/auth/SignIn.vue";
 import SignUp from "../views/auth/SignUp.vue";
 import AdminSignIn from "../views/auth/AdminSignIn.vue";
 import Admin from "../views/admin/Admin.vue";
-import { USER_ROLE } from "../constants/role.js";
+import { USER_ROLE } from "../constants/user/role.js";
 import PropertySearch from "../views/property/PropertySearch.vue";
 import PropertyShow from "../views/property/PropertyShow.vue";
+import AgentApply from "../views/agent/AgentApply.vue";
+import AgentPage from "../views/agent/AgentPage.vue";
 
 // 팀원 각자파트 권한을 나눠서 routes 컴포넌트 경로 적어주세요
 const setMeta = (requiresAuth, guestOnly, roles = []) => {
@@ -50,14 +52,24 @@ const routes = [
     meta: setMeta(false, true),
   },
   {
-    path: "/admin",
+    path: "/admins",
     component: Admin,
     meta: setMeta(true, false, [USER_ROLE.ADMIN]),
   },
   {
-    path: "/admin-sign-in",
+    path: "/admins/sign-in",
     component: AdminSignIn,
     meta: setMeta(false, false),
+  },
+  {
+    path: "/agents",
+    component: AgentPage,
+    meta: setMeta(false, false),
+  },
+  {
+    path: "/agents/apply",
+    component: AgentApply,
+    meta: setMeta(true, false, [USER_ROLE.USER]),
   },
 ];
 
@@ -70,7 +82,6 @@ const router = createRouter({
 // to: 이동하는 router, from: 지금 있는 router
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-  let role = authStore.role;
 
   if (!authStore.authInitialized) {
     try {
@@ -80,6 +91,8 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
+  let role = authStore.role;
+
   // 로그인, 회원가입처럼 "비회원만" 들어갈 수 있는 페이지를 들어갈때
   if (to.meta.guestOnly && authStore.isLoggedIn) {
     return next("/");
@@ -87,7 +100,7 @@ router.beforeEach(async (to, from, next) => {
 
   // admin 권한이 필요한 페이지로 가는데 role이 admin이 아닌경우
   if (to.meta.roles.includes(USER_ROLE.ADMIN) && role != USER_ROLE.ADMIN) {
-    return next("/admin-sign-in");
+    return next("/admins/sign-in");
   }
 
   // 로그인이 필요한 페이지인데 로그인 안 한 경우

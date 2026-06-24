@@ -35,6 +35,10 @@ const mostLikeProperties = ref([
   },
 ]);
 
+const redirectProperties = () => {
+  r;
+};
+
 const benefitCards = ref([
   {
     number: "01",

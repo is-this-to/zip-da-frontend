@@ -1,11 +1,16 @@
 <script setup>
+import { computed } from "vue";
 import Header from "./components/Header.vue";
-import { useAuthStore } from "./store/auth/useAuthStore.js";
+import { useRoute } from "vue-router";
+import Footer from "./components/Footer.vue";
 
-const authStore = useAuthStore();
+const route = useRoute();
+
+const isAdminPage = computed(() => route.path.startsWith("/admin"));
 </script>
 
 <template>
-  <Header v-if="authStore.authInitialized && authStore.role !== 'ADMIN'" />
+  <Header v-if="!isAdminPage" />
   <router-view></router-view>
+  <Footer v-if="!isAdminPage"></Footer>
 </template>
