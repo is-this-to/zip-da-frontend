@@ -1,7 +1,9 @@
 <script setup>
 import { computed, onMounted } from "vue";
 import { usePropertySearchStore } from "../../store/property/usePropertySearchStore";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const propertySearchStore = usePropertySearchStore();
 
 // --- 페이지네이션 로직 ---
@@ -39,6 +41,11 @@ const changePage = (page) => {
   propertySearchStore.searchPropertyPagination(page);
 };
 
+// 매물 상세 이동
+const redirectProperyShow = async (propertyId) => {
+  router.push(`/properties/${propertyId}`);
+};
+
 onMounted(() => {
   propertySearchStore.searchPropertyPagination(1);
 });
@@ -59,6 +66,7 @@ onMounted(() => {
         v-for="item in propertySearchStore.items"
         :key="item.propertyId"
         :style="{ backgroundImage: `url(${item.thumbnailUrl})` }"
+        @click="redirectProperyShow(item.propertyId)"
       >
         <div class="info-box">
           <h3 class="price">
