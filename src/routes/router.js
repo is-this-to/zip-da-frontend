@@ -13,12 +13,6 @@ import MyReportList from "../views/mypage/MyReportList.vue";
 import PropertySearch from "../views/property/PropertySearch.vue";
 import PropertyShow from "../views/property/PropertyShow.vue";
 
-const ROLE = {
-  USER: "USER",
-  AGENT: "AGENT",
-  ADMIN: "ADMIN",
-};
-
 // 팀원 각자파트 권한을 나눠서 routes 컴포넌트 경로 적어주세요
 const setMeta = (requiresAuth, guestOnly, roles = []) => {
   return {
@@ -37,6 +31,16 @@ const routes = [
   {
     path: "/main",
     component: Main,
+    meta: setMeta(false, false),
+  },
+  {
+    path: "/properties",
+    component: PropertySearch,
+    meta: setMeta(false, false),
+  },
+  {
+    path: "/properties/:propertyId",
+    component: PropertyShow,
     meta: setMeta(false, false),
   },
   {

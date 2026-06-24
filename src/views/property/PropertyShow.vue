@@ -2,7 +2,7 @@
 import { onBeforeMount, onBeforeUnmount, ref } from "vue";
 import myAxios from "../../api/myAxios";
 import { useRoute } from "vue-router";
-import transactionTypeCodes from "../../util/code/transactionTypeCode.js";
+import transactionTypeCodes from "../../constants/transactionTypeCode.js";
 import { usePropertyShowStore } from "../../store/property/usePropertyShowStore";
 
 const route = useRoute(); // useRoute 현재 정보
@@ -12,7 +12,7 @@ const { transactionType, getTransactionTypeName } = transactionTypeCodes;
 onBeforeMount(async () => {
   try {
     // URL에서 매물 ID 추출
-    const propertyId = route.params.id;
+    const propertyId = route.params.propertyId;
 
     await propertyShowStore.getProperty(propertyId);
   } catch (error) {
