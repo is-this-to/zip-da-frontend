@@ -2,12 +2,22 @@
 import { computed, onMounted } from "vue";
 import { usePropertySearchStore } from "../../store/property/usePropertySearchStore";
 import { useRouter } from "vue-router";
-
+import transactionTypeCode from "../../constants/transactionTypeCode";
+import propertyType from "../../constants/propertyType";
+import PropertyFilter from "./filter/PropertyFilter.vue";
 const router = useRouter();
 const propertySearchStore = usePropertySearchStore();
 
+const getTransactionName = transactionTypeCode.getTransactionTypeName;
+const getPropertyName = propertyType.getPropertyTypeName;
+
+const formatMoney = (money) => {
+  if (!money) return "0";
+  return money.toLocaleString();
+};
+
 // --- 페이지네이션 로직 ---
-const pageBlockSize = 5;
+const pageBlockSize = 5; // 전체 보여질 페이지버튼 갯수
 
 const totalPages = computed(() => {
   if (propertySearchStore.pageSize === 0) return 0;
@@ -53,6 +63,7 @@ onMounted(() => {
 
 <template>
   <div class="property-container">
+    <PropertyFilter />
     <div class="summary">
       <p>
         총 <strong class="highlight">{{ propertySearchStore.total }}</strong
@@ -70,10 +81,26 @@ onMounted(() => {
       >
         <div class="info-box">
           <h3 class="price">
-            {{ item.transactionType === "JEONSE" ? "전세" : "월세" }}
-            {{ item.deposit }} / {{ item.monthlyRent }}
+            <span class="badge">{{
+              getTransactionName(item.transactionType)
+            }}</span>
+            <template v-if="item.transactionType === 'SALE'">
+              {{ formatMoney(item.price) }}원
+            </template>
+
+            <template v-else-if="item.transactionType === 'JEONSE'">
+              {{ formatMoney(item.deposit) }}원
+            </template>
+
+            <template v-else>
+              {{ formatMoney(item.deposit) }}원 /
+              {{ formatMoney(item.monthlyRent) }}원
+            </template>
           </h3>
-          <p class="desc">{{ item.description }}</p>
+          <p class="desc">
+            [{{ getPropertyName(item.propertyType) }}] {{ item.description }}
+          </p>
+
           <p class="sub-info">
             {{ item.regionName }} | 층수: {{ item.floor }}층 |
             {{ item.areaM2 }}㎡
@@ -122,7 +149,6 @@ onMounted(() => {
   font-size: 16px;
 }
 
-/* 지정하신 글로벌 컬러 사용 */
 .highlight {
   color: var(--personal-color-blue);
 }
@@ -154,6 +180,14 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.card-wrapper:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(141, 162, 231, 0.3);
+  cursor: pointer;
 }
 
 /* 텍스트 정보 영역 (배경 이미지 위에서 잘 보이도록 처리) */
