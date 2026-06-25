@@ -1,6 +1,7 @@
 ﻿<script setup>
 import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import MyButton from "../../components/button/MyButton.vue";
+import router from "../../routes/router.js";
 
 const intro = reactive({
   eyebrow: "일반 사용자부터 공인중개사까지, 누구나 쉽고 안전하게.",
@@ -14,55 +15,48 @@ const mostLikeProperties = ref([
     subtitle: "월세 1000/70 | 서울시 강남구",
     badge: "1등",
     layout: "property-card--wide",
-    image:
-      "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=85",
+    image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=85",
   },
   {
     title: "채광 좋은 남향 투룸",
     subtitle: "전세 2억 | 서울시 송파구",
     badge: "2등",
     layout: "property-card--small",
-    image:
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=900&q=85",
+    image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=900&q=85",
   },
   {
     title: "풀옵션 리모델링 원룸",
     subtitle: "월세 500/50 | 서울시 관악구",
     badge: "3등",
     layout: "property-card--small",
-    image:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=85",
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=85",
   },
 ]);
 
 const redirectProperties = () => {
-  r;
+  router.push("/properties");
 };
 
 const benefitCards = ref([
   {
     number: "01",
     title: "조건별 매물 탐색",
-    description:
-      "지역, 거래 유형, 가격, 옵션을 기준으로 원하는 매물을 빠르게 찾아보세요.",
+    description: "지역, 거래 유형, 가격, 옵션을 기준으로 원하는 매물을 빠르게 찾아보세요.",
   },
   {
     number: "02",
     title: "관심 매물 관리",
-    description:
-      "마음에 드는 매물을 모아두고 가격, 위치, 조건을 차분히 비교하세요.",
+    description: "마음에 드는 매물을 모아두고 가격, 위치, 조건을 차분히 비교하세요.",
   },
   {
     number: "03",
     title: "직접 매물 등록",
-    description:
-      "회원이라면 누구나 사진과 옵션을 담아 직접 매물을 등록할 수 있어요.",
+    description: "회원이라면 누구나 사진과 옵션을 담아 직접 매물을 등록할 수 있어요.",
   },
   {
     number: "04",
     title: "신고와 검토",
-    description:
-      "의심되는 매물은 신고하고, 관리자는 접수된 신고를 확인해 처리할 수 있어요.",
+    description: "의심되는 매물은 신고하고, 관리자는 접수된 신고를 확인해 처리할 수 있어요.",
   },
 ]);
 
@@ -150,36 +144,20 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section
-      class="intro-section reveal"
-      :ref="setRevealRef"
-      aria-label="서비스 소개"
-    >
+    <section class="intro-section reveal" :ref="setRevealRef" aria-label="서비스 소개">
       <p class="intro-eyebrow">{{ intro.eyebrow }}</p>
       <h2>{{ intro.body }}</h2>
     </section>
 
-    <section
-      class="stats-section reveal"
-      :ref="setRevealRef"
-      aria-label="서비스 통계"
-    >
+    <section class="stats-section reveal" :ref="setRevealRef" aria-label="서비스 통계">
       <article v-for="stat in stats" :key="stat.label" class="stat-item">
         <strong>{{ stat.value }}</strong>
         <span>{{ stat.label }}</span>
       </article>
     </section>
 
-    <section
-      class="benefit-section reveal"
-      :ref="setRevealRef"
-      aria-label="주요 기능"
-    >
-      <article
-        v-for="card in benefitCards"
-        :key="card.number"
-        class="benefit-card"
-      >
+    <section class="benefit-section reveal" :ref="setRevealRef" aria-label="주요 기능">
+      <article v-for="card in benefitCards" :key="card.number" class="benefit-card">
         <span>{{ card.number }}</span>
         <h3>{{ card.title }}</h3>
         <p>{{ card.description }}</p>
@@ -226,29 +204,15 @@ onBeforeUnmount(() => {
       <div class="owner-copy reveal" :ref="setRevealRef">
         <span>For owners</span>
         <h2>직접 매물을 올려보세요</h2>
-        <p>
-          수수료 없이 쉽고 빠르게 매물을 등록하고 새로운 세입자를 찾아보세요.
-        </p>
-        <MyButton
-          :content="'매물 등록하기'"
-          :color="'blue'"
-          :size="'small-middle'"
-          :class="'blue-pill'"
-        ></MyButton>
+        <p>수수료 없이 쉽고 빠르게 매물을 등록하고 새로운 세입자를 찾아보세요.</p>
+        <MyButton :content="'매물 등록하기'" :color="'blue'" :size="'small-middle'" :class="'blue-pill'"></MyButton>
       </div>
 
       <div class="owner-visual reveal" :ref="setRevealRef">
-        <img
-          src="https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=1100&q=85"
-          alt="고급 주거 건축물"
-        />
+        <img src="https://images.unsplash.com/photo-1600210492493-0946911123ea?auto=format&fit=crop&w=1100&q=85" alt="고급 주거 건축물" />
 
         <div class="floating-cards reveal" :ref="setRevealRef">
-          <article
-            v-for="card in ctaCards"
-            :key="card.title"
-            class="floating-card"
-          >
+          <article v-for="card in ctaCards" :key="card.title" class="floating-card">
             <span></span>
             <div>
               <h3>{{ card.title }}</h3>
@@ -259,23 +223,14 @@ onBeforeUnmount(() => {
       </div>
     </section>
 
-    <section
-      class="property-section reveal"
-      :ref="setRevealRef"
-      aria-label="추천 매물"
-    >
+    <section class="property-section reveal" :ref="setRevealRef" aria-label="추천 매물">
       <div class="section-heading">
         <span>Recommended homes</span>
         <h2>지금 눈여겨볼 매물</h2>
       </div>
 
       <div class="property-grid">
-        <article
-          v-for="property in mostLikeProperties"
-          :key="property.title"
-          class="property-card"
-          :class="property.layout"
-        >
+        <article v-for="property in mostLikeProperties" :key="property.title" class="property-card" :class="property.layout">
           <img :src="property.image" :alt="property.title" />
           <div class="property-info">
             <span>{{ property.badge }}</span>
@@ -285,12 +240,7 @@ onBeforeUnmount(() => {
         </article>
       </div>
       <div class="button">
-        <MyButton
-          :content="'모든 매물 보기'"
-          :color="'blue'"
-          :size="'small-middle'"
-          :class="'blue-pill'"
-        ></MyButton>
+        <MyButton :content="'모든 매물 보기'" :color="'blue'" :size="'small-middle'" :class="'blue-pill'" @click="redirectProperties"></MyButton>
       </div>
     </section>
   </main>
@@ -315,13 +265,7 @@ onBeforeUnmount(() => {
   min-height: 100vh;
   padding: 34px 60px;
   color: var(--personal-color-black);
-  background:
-    radial-gradient(
-      circle at 15% 0%,
-      rgba(230, 231, 244, 0.78),
-      transparent 30%
-    ),
-    linear-gradient(180deg, #ffffff 0%, #f8f9fc 48%, #ffffff 100%);
+  background: radial-gradient(circle at 15% 0%, rgba(230, 231, 244, 0.78), transparent 30%), linear-gradient(180deg, #ffffff 0%, #f8f9fc 48%, #ffffff 100%);
 }
 
 .hero-section {
@@ -333,14 +277,8 @@ onBeforeUnmount(() => {
   padding: 42px 64px 76px;
   border-radius: 42px;
   background:
-    linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0.72) 0%,
-      rgba(0, 0, 0, 0.2) 46%,
-      rgba(0, 0, 0, 0.02) 100%
-    ),
-    url("https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=2200&q=90")
-      center / cover;
+    linear-gradient(90deg, rgba(0, 0, 0, 0.72) 0%, rgba(0, 0, 0, 0.2) 46%, rgba(0, 0, 0, 0.02) 100%),
+    url("https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=2200&q=90") center / cover;
   box-shadow: 0 28px 90px rgba(0, 0, 0, 0.13);
   max-width: 1420px;
   margin: auto;
@@ -539,11 +477,7 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   padding: 34px;
   border-radius: 32px;
-  background: linear-gradient(
-    145deg,
-    #f6f9ff 0%,
-    var(--personal-color-periwinkle) 100%
-  );
+  background: linear-gradient(145deg, #f6f9ff 0%, var(--personal-color-periwinkle) 100%);
 }
 
 .benefit-card span {
@@ -616,11 +550,7 @@ onBeforeUnmount(() => {
   margin: 0 auto 120px;
   padding: 70px;
   border-radius: 42px;
-  background: linear-gradient(
-    135deg,
-    #f3f8ff 0%,
-    var(--personal-color-periwinkle) 100%
-  );
+  background: linear-gradient(135deg, #f3f8ff 0%, var(--personal-color-periwinkle) 100%);
   margin-top: 60px;
 }
 
@@ -672,15 +602,7 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   padding: 38px;
   border-radius: 34px;
-  background:
-    linear-gradient(45deg, rgba(0, 100, 255, 0.12) 0 8%, transparent 8% 100%),
-    linear-gradient(
-      135deg,
-      transparent 0 44%,
-      rgba(0, 100, 255, 0.14) 44% 48%,
-      transparent 48% 100%
-    ),
-    #edf4fc;
+  background: linear-gradient(45deg, rgba(0, 100, 255, 0.12) 0 8%, transparent 8% 100%), linear-gradient(135deg, transparent 0 44%, rgba(0, 100, 255, 0.14) 44% 48%, transparent 48% 100%), #edf4fc;
 }
 
 .map-tabs {
@@ -805,13 +727,7 @@ onBeforeUnmount(() => {
   height: 42px;
   flex: 0 0 auto;
   border-radius: 50%;
-  background:
-    radial-gradient(
-      circle at center,
-      var(--personal-color-white) 0 28%,
-      transparent 29%
-    ),
-    var(--personal-color-blue);
+  background: radial-gradient(circle at center, var(--personal-color-white) 0 28%, transparent 29%), var(--personal-color-blue);
 }
 
 .floating-card h3 {

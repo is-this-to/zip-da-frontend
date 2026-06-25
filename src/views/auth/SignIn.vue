@@ -5,9 +5,11 @@ import { useAuthStore } from "../../store/auth/useAuthStore.js";
 import signInValidator from "../../util/validator/domain/auth/signInValidator.js";
 import MyButton from "../../components/button/MyButton.vue";
 import MyInput from "../../components/input/MyInput.vue";
+import { useAgentStore } from "../../store/agent/useAgentStore.js";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const agentStore = useAgentStore();
 
 const notYet = () => alert("2차 구현 예정입니다.");
 
@@ -32,6 +34,11 @@ const submitLogin = async () => {
       isSubmitting.value = true;
       errorMessage.value = "";
       await authStore.login(signInForm);
+      try {
+        await agentStore.checkAgentInfo();
+      } catch (error) {
+        throw error;
+      }
       router.push("/main");
     } catch (error) {
       errorMessage.value = "이메일 또는 비밀번호를 확인해 주세요.";
@@ -39,9 +46,7 @@ const submitLogin = async () => {
       isSubmitting.value = false;
     }
   } else {
-    const validationMessages = [emailValResult, passwordValResult].filter(
-      Boolean,
-    );
+    const validationMessages = [emailValResult, passwordValResult].filter(Boolean);
     errorMessage.value = validationMessages.join("\n");
   }
 };
@@ -51,21 +56,14 @@ const submitLogin = async () => {
   <main class="login-page">
     <section class="login-shell">
       <div class="brand-panel">
-        <RouterLink
-          to="/main"
-          class="brand-mark"
-          aria-label="집다 메인으로 이동"
-        >
+        <RouterLink to="/main" class="brand-mark" aria-label="집다 메인으로 이동">
           <strong>ZIPDA</strong>
         </RouterLink>
 
         <div class="brand-copy">
           <p class="eyebrow">Welcome back</p>
           <h1>좋은 집을 찾는 여정을<br />다시 이어가세요.</h1>
-          <p>
-            저장한 검색 조건, 관심 매물까지 로그인 후 한 번에 확인할 수
-            있습니다.
-          </p>
+          <p>저장한 검색 조건, 관심 매물까지 로그인 후 한 번에 확인할 수 있습니다.</p>
         </div>
       </div>
 
@@ -75,14 +73,7 @@ const submitLogin = async () => {
           <h2>로그인</h2>
           <span>집다 계정으로 안전하게 접속하세요.</span>
         </div>
-        <MyInput
-          :content="'이메일'"
-          :input-type="'email'"
-          :auth-complete="'email'"
-          :placeholder="'example@zipda.com'"
-          :required="true"
-          v-model="signInForm.email"
-        ></MyInput>
+        <MyInput :content="'이메일'" :input-type="'email'" :auth-complete="'email'" :placeholder="'example@zipda.com'" :required="true" v-model="signInForm.email"></MyInput>
 
         <MyInput
           v-model="signInForm.password"
@@ -103,13 +94,7 @@ const submitLogin = async () => {
         </div>
 
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-        <MyButton
-          :content="isSubmitting ? '로그인 중...' : '로그인'"
-          :color="'blue'"
-          :size="'middle'"
-          :class="'submit-button'"
-          :btn-type="'submit'"
-        ></MyButton>
+        <MyButton :content="isSubmitting ? '로그인 중...' : '로그인'" :color="'blue'" :size="'middle'" :class="'submit-button'" :btn-type="'submit'"></MyButton>
 
         <div class="divider">
           <span></span>
@@ -117,14 +102,14 @@ const submitLogin = async () => {
           <span></span>
         </div>
 
-        <div class="social-grid">
+        <!-- <div class="social-grid">
           <button type="button" class="kakao-button" @click="notYet">
             Kakao
           </button>
           <button type="button" class="naver-button" @click="notYet">
             Naver
           </button>
-        </div>
+        </div> -->
 
         <p class="signup-copy">
           아직 계정이 없나요?
@@ -143,9 +128,7 @@ const submitLogin = async () => {
   padding: 48px 24px;
   color: #121826;
   background:
-    radial-gradient(circle at 22% 18%, #0064ff2e, transparent 30%),
-    radial-gradient(circle at 76% 82%, #ff624d33, transparent 28%),
-    linear-gradient(135deg, #eef3ff 0%, #f8fbff 46%, #eef2f8 100%);
+    radial-gradient(circle at 22% 18%, #0064ff2e, transparent 30%), radial-gradient(circle at 76% 82%, #ff624d33, transparent 28%), linear-gradient(135deg, #eef3ff 0%, #f8fbff 46%, #eef2f8 100%);
 }
 
 .login-shell {
@@ -169,9 +152,7 @@ const submitLogin = async () => {
   padding: 42px;
   overflow: hidden;
   color: #ffffff;
-  background:
-    linear-gradient(160deg, #041534e6, #0057e7d1),
-    linear-gradient(135deg, #0f172a, #0057e7);
+  background: linear-gradient(160deg, #041534e6, #0057e7d1), linear-gradient(135deg, #0f172a, #0057e7);
 }
 
 .brand-panel::before,

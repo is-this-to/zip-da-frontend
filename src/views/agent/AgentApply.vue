@@ -27,18 +27,15 @@ const submitApply = async () => {
   if (isSubmitting.value) return;
 
   const licenseNoValResult = agentApplyValidator.licenseNo(applyForm.licenseNo);
-  const bussinessNoValResult = agentApplyValidator.businessNo(
-    applyForm.businessNo,
-  );
-  const officeNameValResult = agentApplyValidator.officeName(
-    applyForm.officeName,
-  );
+  const bussinessNoValResult = agentApplyValidator.businessNo(applyForm.businessNo);
+  const officeNameValResult = agentApplyValidator.officeName(applyForm.officeName);
 
   if (!licenseNoValResult && !bussinessNoValResult && !officeNameValResult) {
     try {
       isSubmitting.value = true;
 
       const res = await agentStore.applyAgent(applyForm);
+      router.replace("/");
     } catch (error) {
       errorMessage.value = res.data;
     } finally {
@@ -46,11 +43,7 @@ const submitApply = async () => {
       errorMessage.value = "";
     }
   } else {
-    const validationMessages = [
-      licenseNoValResult,
-      bussinessNoValResult,
-      officeNameValResult,
-    ].filter(Boolean);
+    const validationMessages = [licenseNoValResult, bussinessNoValResult, officeNameValResult].filter(Boolean);
     errorMessage.value = validationMessages.join("\n");
   }
 };
@@ -86,37 +79,19 @@ onBeforeUnmount(() => {
       <div class="apply-header">
         <p class="eyebrow">Agent Verification</p>
         <h1>공인중개사 인증 신청</h1>
-        <p>
-          관리자 검수 후 승인되면 중개사 권한으로 매물을 등록하고 관리할 수
-          있습니다.
-        </p>
+        <p>관리자 검수 후 승인되면 중개사 권한으로 매물을 등록하고 관리할 수 있습니다.</p>
       </div>
 
       <form class="apply-card" @submit.prevent="submitApply">
-        <MyInput
-          v-model="applyForm.licenseNo"
-          :content="'공인중개사 자격번호'"
-          :required="true"
-        />
+        <MyInput v-model="applyForm.licenseNo" :content="'공인중개사 자격번호'" :required="true" />
 
-        <MyInput
-          v-model="applyForm.businessNo"
-          :content="'사업자등록번호'"
-          :required="true"
-        />
+        <MyInput v-model="applyForm.businessNo" :content="'사업자등록번호'" :required="true" />
 
-        <MyInput
-          v-model="applyForm.officeName"
-          :content="'중개사무소명'"
-          :required="true"
-        />
+        <MyInput v-model="applyForm.officeName" :content="'중개사무소명'" :required="true" />
 
         <div class="notice-box">
           <strong>확인해 주세요</strong>
-          <p>
-            제출한 정보는 관리자 검수에만 사용됩니다. 승인 전까지는 신청 상태가
-            대기로 표시됩니다.
-          </p>
+          <p>제출한 정보는 관리자 검수에만 사용됩니다. 승인 전까지는 신청 상태가 대기로 표시됩니다.</p>
         </div>
 
         <p v-if="errorMessage" class="message error-message">
@@ -125,31 +100,14 @@ onBeforeUnmount(() => {
 
         <div class="agentProfileImageBox">
           <div class="profile-label">중개사 프로필 이미지</div>
-          <div
-            class="preview"
-            v-if="preview"
-            :style="{ backgroundImage: `url(${preview})` }"
-          ></div>
+          <div class="preview" v-if="preview" :style="{ backgroundImage: `url(${preview})` }"></div>
           <input type="file" accept="image/*" @change="handleChangeProfile" />
         </div>
 
         <div class="button-row">
-          <MyButton
-            :content="'취소'"
-            :color="'white'"
-            :size="'middle'"
-            :btn-type="'button'"
-            :class="'blue-pill'"
-            @click="router.back()"
-          />
+          <MyButton :content="'취소'" :color="'white'" :size="'middle'" :btn-type="'button'" :class="'blue-pill'" @click="router.back()" />
 
-          <MyButton
-            :content="isSubmitting ? '신청 중...' : '인증 신청'"
-            :color="'blue'"
-            :size="'middle'"
-            :class="'blue-pill'"
-            :btn-type="'submit'"
-          />
+          <MyButton :content="isSubmitting ? '신청 중...' : '인증 신청'" :color="'blue'" :size="'middle'" :class="'blue-pill'" :btn-type="'submit'" />
         </div>
       </form>
     </section>
@@ -160,9 +118,7 @@ onBeforeUnmount(() => {
 .agent-apply-page {
   min-height: 100vh;
   padding: 72px 20px 96px;
-  background:
-    linear-gradient(180deg, #f8f9fd 0%, #ffffff 48%),
-    var(--personal-color-white);
+  background: linear-gradient(180deg, #f8f9fd 0%, #ffffff 48%), var(--personal-color-white);
 }
 
 .apply-shell {
