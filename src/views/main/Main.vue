@@ -186,7 +186,7 @@ onBeforeUnmount(() => {
       </article>
     </section>
 
-    <section class="map-section" aria-label="지도 기반 탐색">
+    <!-- <section class="map-section" aria-label="지도 기반 탐색">
       <div class="map-copy reveal" :ref="setRevealRef">
         <span>Map search</span>
         <h2>지도에서 한눈에 원하는 집을 찾아보세요</h2>
@@ -220,7 +220,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <section class="owner-section" aria-label="매물 등록 안내">
       <div class="owner-copy reveal" :ref="setRevealRef">

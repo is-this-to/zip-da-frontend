@@ -1,13 +1,15 @@
 <script setup>
-import { reactive, ref } from "vue";
+import { onBeforeUnmount, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import MyInput from "../../components/input/MyInput.vue";
 import MyButton from "../../components/button/MyButton.vue";
 import agentApplyValidator from "../../util/validator/domain/auth/agentApplyValidator.js";
 import { useFileStore } from "../../store/file/useFileStore.js";
+import { useAgentStore } from "../../store/agent/useAgentStore.js";
 
 const router = useRouter();
 const fileStore = useFileStore();
+const agentStore = useAgentStore();
 
 const applyForm = reactive({
   licenseNo: "",
@@ -18,6 +20,7 @@ const applyForm = reactive({
 
 const isSubmitting = ref(false);
 const errorMessage = ref("");
+// 미리 보기 용 임시 URL 저장
 const preview = ref(null);
 
 const submitApply = async () => {
@@ -27,18 +30,20 @@ const submitApply = async () => {
   const bussinessNoValResult = agentApplyValidator.businessNo(
     applyForm.businessNo,
   );
-  const officeNameValResult = agentApplyValidator.officeNameValResult(
+  const officeNameValResult = agentApplyValidator.officeName(
     applyForm.officeName,
   );
 
   if (!licenseNoValResult && !bussinessNoValResult && !officeNameValResult) {
     try {
       isSubmitting.value = true;
-      errorMessage.value = "";
+
+      const res = await agentStore.applyAgent(applyForm);
     } catch (error) {
-      errorMessage.value = "";
+      errorMessage.value = res.data;
     } finally {
       isSubmitting.value = false;
+      errorMessage.value = "";
     }
   } else {
     const validationMessages = [
@@ -67,6 +72,12 @@ const handleChangeProfile = async (e) => {
     }
   }
 };
+
+onBeforeUnmount(() => {
+  if (preview.value) {
+    URL.revokeObjectURL(preview.value);
+  }
+});
 </script>
 
 <template>
@@ -119,7 +130,7 @@ const handleChangeProfile = async (e) => {
             v-if="preview"
             :style="{ backgroundImage: `url(${preview})` }"
           ></div>
-          <input type="file" accept="image/*" />
+          <input type="file" accept="image/*" @change="handleChangeProfile" />
         </div>
 
         <div class="button-row">
@@ -243,7 +254,7 @@ const handleChangeProfile = async (e) => {
   border-radius: 16px;
   border: 1px solid var(--personal-color-periwinkle);
   background-position: center;
-  background-size: cover;
+  background-size: contain;
   background-repeat: no-repeat;
   background-color: #ffffff;
   box-shadow: 0 10px 24px rgba(31, 31, 31, 0.08);
@@ -296,15 +307,6 @@ button:hover {
   align-items: center;
   justify-content: center;
   padding: 5px;
-}
-
-.preview {
-  width: 150px;
-  height: 150px;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-  border-radius: 32px;
 }
 
 .button-row {

@@ -64,7 +64,7 @@ const routes = [
   {
     path: "/agents",
     component: AgentPage,
-    meta: setMeta(false, false),
+    meta: setMeta(false, false, [USER_ROLE.AGENT]),
   },
   {
     path: "/agents/apply",
@@ -110,7 +110,14 @@ router.beforeEach(async (to, from, next) => {
 
   // 중개사 권한이 필요한데 중개사 권한이 없는 경우
   if (to.meta.roles.includes(USER_ROLE.AGENT) && role != USER_ROLE.AGENT) {
-    // -------- 공인중개사 인증 페이지로 이동 -> 나중에 추가 예정
+    // 로그인 자체를 안 한 사용자 -> 회원가입 화면으로 이동
+    if (authStore.role === null) {
+      return next("/sign-in");
+    }
+    // Agent 권한이 없는 사용자가 접근 -> 중개사 인증 페이지로 이동
+    if (authStore.role === USER_ROLE.USER) {
+      return next("/agents/apply");
+    }
   }
 
   //특정 권한이 필요한데 없는 경우 메인페이지로 이동

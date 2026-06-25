@@ -12,6 +12,7 @@ export const useFileStore = defineStore("fileStore", () => {
   const storeAgentProfile = async (file) => {
     try {
       const url = "/api/agent-images";
+      // formdata 생성
       const data = new FormData();
       data.append("file", file);
 
@@ -22,9 +23,18 @@ export const useFileStore = defineStore("fileStore", () => {
       };
 
       const res = await myAxios.post(url, data, config);
-      return res.data.fileUri;
+      return res.data.data.fileUri;
     } catch (error) {
       throw error;
     }
+  };
+
+  return {
+    // 1. State
+
+    // 2. Getter
+
+    // 3. Actions
+    storeAgentProfile,
   };
 });

@@ -29,7 +29,7 @@ export const officeName = (val) => {
     return "비밀번호는 필수입니다.";
   }
 
-  if (val.length() > 100) {
+  if (val.length > 100) {
     return "중개사무소명은 100자 이하로 입력해 주세요.";
   }
 
