@@ -12,7 +12,7 @@ const guestNavItems = [
   {
     content: "매물 조회",
     // 후에 router push할때 사용
-    path: "/",
+    path: "/properties",
   },
   {
     content: "공인중개사 페이지",
@@ -24,11 +24,11 @@ const userNavItems = [
   {
     content: "매물 조회",
     // 후에 router push할때 사용
-    path: "/",
+    path: "/properties",
   },
   {
     content: "매물 등록",
-    path: "/",
+    path: "/properties/new",
   },
   {
     content: "공인중개사 페이지",

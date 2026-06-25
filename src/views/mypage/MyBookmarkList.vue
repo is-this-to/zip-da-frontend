@@ -1,6 +1,7 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { getMyBookmarkList } from "../../api/bookmarkApi";
+import transactionTypeCodes from "../../constants/transactionTypeCode.js";
 
 const bookmarkList = ref([]);
 const isLoading = ref(false);
@@ -21,12 +22,14 @@ const typeLabel = {
   HOUSE: "주택",
 };
 
-const transactionLabel = {
-  SALE: "매매",
-  JEONSE: "전세",
-  MONTHLY_RENT: "월세",
-  SHORT_TERM: "단기",
-};
+// const transactionLabel = {
+//   SALE: "매매",
+//   JEONSE: "전세",
+//   MONTHLY_RENT: "월세",
+//   SHORT_TERM: "단기",
+// };
+
+const { transactionType, getTransactionTypeName } = transactionTypeCodes;
 
 const priceText = (bookmark) => {
   if (bookmark.transactionType === "SALE") {
@@ -69,7 +72,9 @@ onMounted(fetchBookmarkList);
     </div>
 
     <div class="list-title">
-      <h2>찜한 매물 <b>{{ countText }}</b></h2>
+      <h2>
+        찜한 매물 <b>{{ countText }}</b>
+      </h2>
     </div>
 
     <div v-if="isLoading" class="state-card">찜 목록을 불러오는 중입니다…</div>
@@ -108,16 +113,28 @@ onMounted(fetchBookmarkList);
           <strong class="price">{{ priceText(bookmark) }}</strong>
           <p class="title">
             {{ typeLabel[bookmark.propertyType] || bookmark.propertyType }} ·
-            {{ transactionLabel[bookmark.transactionType] || bookmark.transactionType }}
+            {{
+              getTransactionTypeName([bookmark.transactionType]) ||
+              bookmark.transactionType
+            }}
           </p>
           <p class="detail">
             {{ bookmark.regionName || "지역 정보 없음" }}
-            <template v-if="bookmark.floor"> | 층수: {{ bookmark.floor }}층</template>
-            <template v-if="bookmark.areaM2"> | {{ bookmark.areaM2 }}㎡</template>
+            <template v-if="bookmark.floor">
+              | 층수: {{ bookmark.floor }}층</template
+            >
+            <template v-if="bookmark.areaM2">
+              | {{ bookmark.areaM2 }}㎡</template
+            >
           </p>
 
           <div class="tags">
-            <span v-if="bookmark.maintenanceFee !== null && bookmark.maintenanceFee !== undefined">
+            <span
+              v-if="
+                bookmark.maintenanceFee !== null &&
+                bookmark.maintenanceFee !== undefined
+              "
+            >
               관리비 {{ number(bookmark.maintenanceFee) }}
             </span>
             <span>상세보기</span>

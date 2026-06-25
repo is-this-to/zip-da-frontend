@@ -28,8 +28,6 @@ const roleLabel = computed(() => {
       </div>
 
       <MyPageNav />
-
-      <RouterLink to="/properties/new" class="post-button">Post New Listing</RouterLink>
     </aside>
 
     <section class="mypage-content">
@@ -97,20 +95,6 @@ const roleLabel = computed(() => {
   margin-top: 3px;
   color: #8b94a4;
   font-size: 12px;
-}
-
-.post-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 38px;
-  margin-top: 36px;
-  border-radius: 8px;
-  color: #0064ff;
-  background: #e7efff;
-  font-size: 12px;
-  font-weight: 900;
-  text-decoration: none;
 }
 
 .mypage-content {

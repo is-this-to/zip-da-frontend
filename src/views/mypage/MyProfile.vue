@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from "vue";
+import { useRouter } from "vue-router"; // router.push 사용하려면 꼭 필요
 import { useAuthStore } from "../../store/auth/useAuthStore";
 import {
   getMyProfile,
@@ -8,29 +9,38 @@ import {
 } from "../../api/myPageApi";
 
 const authStore = useAuthStore();
+const router = useRouter();
 
 const loading = ref(true);
 const saving = ref(false);
 const message = ref("");
 const errorMessage = ref("");
 
+const passwordModalOpen = ref(false); // 비밀번호 변경 모달 열림 여부
+const withdrawModalOpen = ref(false); // 회원탈퇴 모달 열림 여부
+
 const photoUrl = ref("");
 const selectedPhotoFile = ref(null);
-const passwordModalOpen = ref(false);
-const withdrawModalOpen = ref(false);
 
 const form = reactive({
   name: "",
   nick: "",
   email: "",
   phone: "",
+  role: "", // isAgent에서 사용하니까 처음부터 넣어주는 게 안전함
 });
 
 let initialForm = "";
+let initialPhotoUrl = ""; // 취소 눌렀을 때 기존 사진으로 되돌리기 위해 필요
 
 const isAgent = computed(() => {
   return authStore.role === "AGENT" || form.role === "AGENT";
 });
+
+const handleLogout = async () => {
+  await authStore.logout();
+  router.push("/main");
+};
 
 const fillForm = (data = {}) => {
   Object.assign(form, {
@@ -42,6 +52,7 @@ const fillForm = (data = {}) => {
   });
 
   photoUrl.value = data.profileImageUrl ?? "";
+  initialPhotoUrl = photoUrl.value; // 처음 불러온 사진 저장
   selectedPhotoFile.value = null;
   initialForm = JSON.stringify(form);
 };
@@ -71,11 +82,19 @@ const choosePhoto = (event) => {
 
   selectedPhotoFile.value = file;
   photoUrl.value = URL.createObjectURL(file);
-  message.value = "사진 미리보기가 적용되었습니다. 저장하기를 눌러야 반영됩니다.";
+  message.value =
+    "사진 미리보기가 적용되었습니다. 저장하기를 눌러야 반영됩니다.";
+};
+
+const deletePhoto = () => {
+  photoUrl.value = "";
+  selectedPhotoFile.value = null;
+  message.value = "프로필 사진이 삭제되었습니다. 저장하기를 눌러야 반영됩니다.";
 };
 
 const resetForm = () => {
   Object.assign(form, JSON.parse(initialForm));
+  photoUrl.value = initialPhotoUrl; // 기존 사진으로 복구
   selectedPhotoFile.value = null;
   message.value = "변경 내용을 되돌렸습니다.";
   errorMessage.value = "";
@@ -100,9 +119,10 @@ const saveProfile = async () => {
 
     let uploadedImageUrl = photoUrl.value;
 
-    // 공인중개사만 프로필 사진을 서버에 저장합니다.
     if (isAgent.value && selectedPhotoFile.value) {
-      const uploadResult = await uploadAgentProfileImage(selectedPhotoFile.value);
+      const uploadResult = await uploadAgentProfileImage(
+        selectedPhotoFile.value,
+      );
       uploadedImageUrl = uploadResult.data?.fileUri ?? "";
     }
 
@@ -110,8 +130,12 @@ const saveProfile = async () => {
       name: form.name,
       nick: form.nick,
       phone: form.phone,
-      profileImageUrl: isAgent.value ? uploadedImageUrl : null,
     };
+
+    // 공인중개사일 때만 프로필 이미지 주소를 보냄
+    if (isAgent.value) {
+      updatePayload.profileImageUrl = uploadedImageUrl;
+    }
 
     const result = await updateMyProfile(updatePayload);
     fillForm(result.data ?? updatePayload);
@@ -130,10 +154,10 @@ const saveProfile = async () => {
     saving.value = false;
   }
 };
+
 onMounted(() => {
   loadProfile();
 });
-
 </script>
 
 <template>
@@ -157,7 +181,6 @@ onMounted(() => {
 
       <div>
         <h2>프로필 사진</h2>
-        <p>공인중개사는 프로필 사진이 필요합니다. JPG, PNG, WEBP · 최대 5MB</p>
 
         <div class="photo-actions">
           <label>
@@ -168,7 +191,7 @@ onMounted(() => {
             />
             사진 변경
           </label>
-          <button type="button" @click="photoUrl = ''">삭제</button>
+          <button type="button" @click="deletePhoto">삭제</button>
         </div>
       </div>
     </section>
@@ -207,58 +230,39 @@ onMounted(() => {
     <p v-if="errorMessage" class="notice error" role="alert">
       {{ errorMessage }}
     </p>
-
     <div class="form-actions">
       <button type="button" class="secondary" @click="resetForm">취소</button>
+
       <button class="primary" :disabled="saving">
         {{ saving ? "저장 중…" : "저장하기" }}
       </button>
     </div>
 
-    <section class="setting-card">
-      <h2>계정 설정</h2>
-
-      <button type="button" class="setting-row" @click="passwordModalOpen = true">
+    <div class="profile-buttons">
+      <button
+        type="button"
+        class="setting-row"
+        @click="passwordModalOpen = true"
+      >
         <span class="setting-icon">🔒</span>
         <strong>비밀번호 변경</strong>
       </button>
 
-      <button type="button" class="setting-row disabled-row" disabled>
+      <button type="button" class="setting-row" @click="handleLogout">
         <span class="setting-icon">↪</span>
         <strong>로그아웃</strong>
-        <small>로그아웃은 담당자 기능 연결 후 사용</small>
       </button>
 
-      <button type="button" class="setting-row danger-row" @click="withdrawModalOpen = true">
+      <button
+        type="button"
+        class="setting-row danger-row"
+        @click="withdrawModalOpen = true"
+      >
         <span class="setting-icon">⚠</span>
         <strong>회원 탈퇴</strong>
       </button>
-    </section>
+    </div>
   </form>
-
-  <!-- 비밀번호 변경 모양만 만든 모달 -->
-  <div v-if="passwordModalOpen" class="modal-backdrop" @click.self="passwordModalOpen = false">
-    <section class="modal">
-      <button class="close" type="button" @click="passwordModalOpen = false">×</button>
-      <h2>비밀번호 변경</h2>
-      <p>지금은 화면만 만든 상태입니다. API 연결은 나중에 붙이면 됩니다.</p>
-      <input type="password" placeholder="현재 비밀번호" disabled />
-      <input type="password" placeholder="새 비밀번호" disabled />
-      <input type="password" placeholder="새 비밀번호 확인" disabled />
-      <button type="button" class="primary full" disabled>변경하기</button>
-    </section>
-  </div>
-
-  <!-- 회원탈퇴 모양만 만든 모달 -->
-  <div v-if="withdrawModalOpen" class="modal-backdrop" @click.self="withdrawModalOpen = false">
-    <section class="modal">
-      <button class="close" type="button" @click="withdrawModalOpen = false">×</button>
-      <h2>회원 탈퇴</h2>
-      <p>지금은 화면만 만든 상태입니다. 실제 탈퇴 API는 아직 호출하지 않습니다.</p>
-      <input placeholder="탈퇴합니다" disabled />
-      <button type="button" class="danger full" disabled>탈퇴하기</button>
-    </section>
-  </div>
 </template>
 
 <style scoped>
@@ -285,8 +289,7 @@ onMounted(() => {
 
 .state-card,
 .photo-card,
-.form-card,
-.setting-card {
+.form-card {
   border: 1px solid #ebedf3;
   border-radius: 14px;
   background: #fff;
@@ -326,15 +329,9 @@ onMounted(() => {
   font-weight: 900;
 }
 
-.photo-card h2,
-.setting-card h2 {
+.photo-card h2 {
   margin-bottom: 5px;
   font-size: 16px;
-}
-
-.photo-card p {
-  color: #8b94a4;
-  font-size: 12px;
 }
 
 .photo-actions {
@@ -364,8 +361,7 @@ onMounted(() => {
   display: none;
 }
 
-.form-card,
-.setting-card {
+.form-card {
   padding: 24px;
 }
 
@@ -421,8 +417,7 @@ onMounted(() => {
   gap: 9px;
 }
 
-.form-actions button,
-.full {
+.form-actions button {
   height: 42px;
   padding: 0 22px;
   border: 0;
@@ -462,102 +457,6 @@ onMounted(() => {
   background: #fff0f1;
 }
 
-.setting-card {
-  display: grid;
-  gap: 8px;
-  background: #f1f5ff;
-}
-
-.setting-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  border: 0;
-  border-radius: 8px;
-  color: #3f4a5f;
-  background: transparent;
-  text-align: left;
-  cursor: pointer;
-}
-
-.setting-row:hover:not(:disabled) {
-  background: #e6efff;
-}
-
-.setting-row small {
-  margin-left: auto;
-  color: #9ba3b2;
-  font-size: 11px;
-}
-
-.disabled-row {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.danger-row {
-  color: #d5293e;
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: grid;
-  place-items: center;
-  padding: 20px;
-  background: rgba(24, 34, 51, 0.55);
-}
-
-.modal {
-  position: relative;
-  width: min(100%, 420px);
-  padding: 30px;
-  border-radius: 15px;
-  background: #fff;
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
-}
-
-.close {
-  position: absolute;
-  top: 12px;
-  right: 15px;
-  border: 0;
-  color: #7e8796;
-  background: transparent;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.modal h2 {
-  margin-bottom: 9px;
-}
-
-.modal p {
-  margin-bottom: 18px;
-  color: #737c8c;
-  font-size: 13px;
-}
-
-.modal input {
-  width: 100%;
-  height: 43px;
-  margin-bottom: 10px;
-  padding: 0 12px;
-  border: 1px solid #dfe4ec;
-  border-radius: 8px;
-}
-
-.danger {
-  color: #fff;
-  background: #dc3548;
-}
-
-.full {
-  width: 100%;
-}
-
 @media (max-width: 640px) {
   .form-grid {
     grid-template-columns: 1fr;
@@ -570,5 +469,39 @@ onMounted(() => {
   .form-actions button {
     flex: 1;
   }
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid #e4e8f0;
+  border-radius: 10px;
+  background: #fff;
+  color: #263247;
+  font: inherit;
+  cursor: pointer;
+}
+
+.setting-row + .setting-row {
+  margin-top: 10px;
+}
+
+.setting-row strong {
+  font-size: 14px;
+}
+
+.setting-icon {
+  width: 28px;
+  text-align: center;
+}
+
+.danger-row {
+  color: #bd2635;
+  border-color: #ffd5da;
+  background: #fff7f8;
 }
 </style>

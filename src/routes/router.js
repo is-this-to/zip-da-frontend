@@ -10,6 +10,9 @@ import MyBookmarkList from "../views/mypage/MyBookmarkList.vue";
 import MyPostList from "../views/mypage/MyPostList.vue";
 import MyReportList from "../views/mypage/MyReportList.vue";
 
+import Admin from "../views/admin/Admin.vue";
+import { USER_ROLE } from "../constants/role.js";
+
 import PropertySearch from "../views/property/PropertySearch.vue";
 import PropertyShow from "../views/property/PropertyShow.vue";
 
@@ -115,7 +118,7 @@ router.beforeEach(async (to, from, next) => {
   if (!authStore.authInitialized) {
     try {
       await authStore.reissue();
-    } catch {
+    } catch (error) {
       throw error;
     }
   }
@@ -132,7 +135,7 @@ router.beforeEach(async (to, from, next) => {
   }
 
   // 3. 중개사 권한이 필요한데 중개사 권한이 없는 경우
-  if (to.meta.roles.includes(ROLE.AGENT) && role != ROLE.AGENT) {
+  if (to.meta.roles.includes(USER_ROLE.AGENT) && role != USER_ROLE.AGENT) {
     // -------- 공인중개사 인증 페이지로 이동 -> 나중에 추가 예정
   }
 
