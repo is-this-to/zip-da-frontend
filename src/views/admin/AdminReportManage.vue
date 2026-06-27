@@ -2,11 +2,17 @@
 import { computed, onMounted } from "vue";
 import { useAdminReportStore } from "../../store/admin/useAdminReportStore";
 import { useRouter } from "vue-router";
+import propertyTypeCodes from "../../constants/propertyType.js";
+import reportTypeCodes from "../../constants/reportType.js";
+import reportStatusCodes from "../../constants/reportStatusCode.js";
 
 const router = useRouter();
 const adminReportStore = useAdminReportStore();
+const { propertyType, getPropertyTypeName } = propertyTypeCodes;
+const { reportType, getReportTypeName } = reportTypeCodes;
+const { reportStatus, getReportStatusName } = reportStatusCodes;
 
-// --- 페이지네이션 로직 ---
+// --- 페이지네이션 로직 START---
 const pageBlockSize = 5;
 
 const totalPages = computed(() => {
@@ -40,37 +46,17 @@ const changePage = (page) => {
   if (page === adminReportStore.currentPage) return;
   adminReportStore.getReport(page);
 };
-//-------------------------------------
-
-// 현재 페이지 번호
-// const currentPage = ref(1);
-
-// 전체 페이지 수
-// const totalPages = ref(4);
+// --- 페이지네이션 로직 END---
 
 // 반려 버튼 클릭 시 실행
-const handleReject = (reportId) => {
-  console.log("반려할 신고 번호:", reportId);
+const handleReject = async (reportId, propertyId) => {
+  await adminReportStore.setStatus(reportId, "REJECTED", propertyId);
 };
 
 // 삭제 버튼 클릭 시 실행
-const handleDelete = (reportId) => {
-  console.log("삭제할 신고 번호:", reportId);
+const handleDelete = async (reportId, propertyId) => {
+  await adminReportStore.setStatus(reportId, "DELETED", propertyId);
 };
-
-// 이전 페이지 이동
-// const goPrevPage = () => {
-//   if (currentPage.value > 1) {
-//     currentPage.value -= 1;
-//   }
-// };
-
-// 다음 페이지 이동
-// const goNextPage = () => {
-//   if (currentPage.value < totalPages.value) {
-//     currentPage.value += 1;
-//   }
-// };
 
 onMounted(() => {
   adminReportStore.getReport(1);
@@ -135,10 +121,12 @@ onMounted(() => {
             <thead>
               <tr>
                 <th>매물정보 / 주소</th>
+                <th>신고유형</th>
                 <th>신고사유</th>
+                <th>신고자</th>
+                <th>신고일자</th>
                 <th>횟수</th>
                 <th>신고상태</th>
-                <th>신고일자</th>
                 <th>조치</th>
               </tr>
             </thead>
@@ -148,42 +136,51 @@ onMounted(() => {
                 <!-- 매물 정보 / 주소 -->
                 <td>
                   <div class="property-info">
-                    <img :src="item.thumbnailUrl" class="property-image" />
+                    <!-- <img :src="item.thumbnailUrl" class="property-image" /> -->
                     <div class="property-text">
-                      <strong>{{ item.propertyName }}</strong>
+                      <!-- <strong>{{ item.propertyName }}</strong> -->
                       <p>{{ item.address }}</p>
                       <span>
-                        {{ item.propertyType }} | {{ item.areaM2 }} |
-                        {{ item.floor }}
+                        {{ getPropertyTypeName(item.propertyType) }} |
+                        {{ item.areaM2 }}㎡ | {{ item.floor }}층
                       </span>
                     </div>
                   </div>
                 </td>
-
+                <!-- 신고 유형 -->
+                <td>
+                  {{ getReportTypeName(item.reportType) }}
+                </td>
                 <!-- 신고 사유 -->
-                <td>{{ item.reason }}</td>
-
+                <td>
+                  {{ item.reason }}
+                </td>
+                <!-- 신고자 -->
+                <td>
+                  {{ item.reporter }}
+                </td>
+                <!-- 신고 일자 -->
+                <td>
+                  {{ item.reportDate }}
+                </td>
                 <!-- 신고 횟수 -->
-                <td class="count-text">{{ item.countByProperty }}</td>
-
+                <td class="count-text">
+                  {{ item.countByProperty }}
+                </td>
                 <!-- 신고 상태 -->
                 <td>
                   <span :class="['status-badge', item.status]">
                     <span class="status-dot"></span>
-                    {{ item.status }}
+                    {{ getReportStatusName(item.status) }}
                   </span>
                 </td>
-
-                <!-- 신고 날짜 -->
-                <td>{{ item.reportDate }}</td>
-
                 <!-- 조치 버튼 -->
                 <td>
-                  <div class="action-buttons">
+                  <div class="action-buttons" v-if="item.status == 'RECEIVED'">
                     <button
                       type="button"
                       class="reject-button"
-                      @click="handleReject(item.reportId)"
+                      @click="handleReject(item.reportId, item.propertyId)"
                     >
                       반려
                     </button>
@@ -191,7 +188,7 @@ onMounted(() => {
                     <button
                       type="button"
                       class="delete-button"
-                      @click="handleDelete(item.reportId)"
+                      @click="handleDelete(item.reportId, item.propertyId)"
                     >
                       삭제
                     </button>
@@ -222,6 +219,31 @@ onMounted(() => {
             ›
           </button>
         </div> -->
+        <!-- 페이지네이션 -->
+        <div class="pagination">
+          <button
+            @click="changePage(adminReportStore.currentPage - 1)"
+            :disabled="adminReportStore.currentPage === 1"
+          >
+            &lt; 이전
+          </button>
+
+          <button
+            v-for="page in visiblePages"
+            :key="page"
+            @click="changePage(page)"
+            :class="{ active: adminReportStore.currentPage === page }"
+          >
+            {{ page }}
+          </button>
+
+          <button
+            @click="changePage(adminReportStore.currentPage + 1)"
+            :disabled="adminReportStore.lastPage || totalPages === 0"
+          >
+            다음 &gt;
+          </button>
+        </div>
       </section>
     </main>
   </div>
@@ -421,35 +443,47 @@ onMounted(() => {
 /* 컬럼 너비 */
 .report-table th:nth-child(1),
 .report-table td:nth-child(1) {
-  width: 42%;
+  width: 20%;
 }
 
 .report-table th:nth-child(2),
 .report-table td:nth-child(2) {
-  width: 13%;
+  width: 10%;
 }
 
 .report-table th:nth-child(3),
 .report-table td:nth-child(3) {
-  width: 8%;
+  width: 25%;
   text-align: center;
 }
 
 .report-table th:nth-child(4),
 .report-table td:nth-child(4) {
-  width: 14%;
+  width: 10%;
   text-align: center;
 }
 
 .report-table th:nth-child(5),
 .report-table td:nth-child(5) {
-  width: 13%;
+  width: 8%;
   text-align: center;
 }
 
 .report-table th:nth-child(6),
 .report-table td:nth-child(6) {
-  width: 16%;
+  width: 6%;
+  text-align: center;
+}
+
+.report-table th:nth-child(7),
+.report-table td:nth-child(7) {
+  width: 8%;
+  text-align: center;
+}
+
+.report-table th:nth-child(8),
+.report-table td:nth-child(8) {
+  width: 13%;
   text-align: center;
 }
 
@@ -577,7 +611,29 @@ onMounted(() => {
   background-color: #fecaca;
 }
 
-/* 페이지네이션 */
+/* 페이지네이션 버튼 */
+.pagination {
+  margin-top: 26px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  border: 1px solid var(--personal-color-periwinkle);
+  background-color: var(--personal-color-white);
+  color: var(--personal-color-gray);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* 페이지네이션
 .pagination {
   margin-top: 26px;
   display: flex;
@@ -608,7 +664,7 @@ onMounted(() => {
   color: #ffffff;
   border-color: #2563eb;
   box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
-}
+} */
 
 /* 작은 화면 대응 */
 @media (max-width: 1100px) {
