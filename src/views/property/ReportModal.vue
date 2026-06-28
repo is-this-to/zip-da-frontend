@@ -1,10 +1,10 @@
 <script setup>
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import MyButton from "../../components/button/MyButton.vue";
 import reportTypeCodes from "../../constants/reportType.js";
-import { usePropertyShowStore } from "../../store/property/usePropertyShowStore.js";
 import { useAuthStore } from "../../store/auth/useAuthStore.js";
 import myAxios from "../../api/myAxios.js";
+import { useRoute } from "vue-router";
 
 const props = defineProps({
   visible: Boolean,
@@ -12,11 +12,12 @@ const props = defineProps({
 
 const emit = defineEmits(["close"]);
 
+const route = useRoute();
+
+const propertyId = computed(() => Number(route.params.propertyId));
 const selectedReportType = ref("");
 const reason = ref("");
-
 const reportType = reportTypeCodes.reportType;
-const propertyShowStore = usePropertyShowStore();
 const authStore = useAuthStore();
 
 const submit = async () => {
@@ -27,7 +28,7 @@ const submit = async () => {
 
   try {
     const payload = {
-      propertyId: propertyShowStore.property.propertyId,
+      propertyId: propertyId.value,
       userId: authStore.userInfo.userId,
       reportType: selectedReportType.value,
       reason: reason.value,
@@ -45,7 +46,7 @@ const submit = async () => {
   } catch (error) {
     const data = error.response.data;
     if (data.code === "E30") {
-      alert(data.data);
+      alert(data.data); // 같은 회원이 같은 매물 중복 신고입니다.
     }
   }
 };

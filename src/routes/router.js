@@ -8,6 +8,7 @@ import Admin from "../views/admin/Admin.vue";
 import { USER_ROLE } from "../constants/role.js";
 import PropertySearch from "../views/property/PropertySearch.vue";
 import PropertyShow from "../views/property/PropertyShow.vue";
+import AdminReportManage from "../views/admin/AdminReportManage.vue";
 
 // 팀원 각자파트 권한을 나눠서 routes 컴포넌트 경로 적어주세요
 const setMeta = (requiresAuth, guestOnly, roles = []) => {
@@ -58,6 +59,11 @@ const routes = [
     path: "/admin-sign-in",
     component: AdminSignIn,
     meta: setMeta(false, false),
+  },
+  {
+    path: "/admin/reports",
+    component: AdminReportManage,
+    meta: setMeta(true, false, [USER_ROLE.ADMIN]),
   },
 ];
 
