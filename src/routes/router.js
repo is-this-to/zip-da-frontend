@@ -8,6 +8,9 @@ import Admin from "../views/admin/Admin.vue";
 import { USER_ROLE } from "../constants/role.js";
 import PropertySearch from "../views/property/PropertySearch.vue";
 import PropertyShow from "../views/property/PropertyShow.vue";
+import PropertyCreate from "../views/property/PropertyCreate.vue";
+import PropertyEdit from "../views/property/PropertyEdit.vue";
+import PropertyDetail from "../views/property/PropertyDetail.vue";
 
 // 팀원 각자파트 권한을 나눠서 routes 컴포넌트 경로 적어주세요
 const setMeta = (requiresAuth, guestOnly, roles = []) => {
@@ -36,9 +39,21 @@ const routes = [
   },
   {
     path: "/properties/:propertyId",
-    component: PropertyShow,
+    component: PropertyDetail,
     meta: setMeta(false, false),
   },
+  // ============ 매물 도메인 (담당: 임호탁 / feature/property_LHT) ============
+  {
+    path: "/properties/create",
+    component: PropertyCreate,
+    meta: setMeta(false, false), // TODO: 한지윤 인증 머지 완료 후 setMeta(true, false, [USER_ROLE.USER, USER_ROLE.AGENT, USER_ROLE.ADMIN])
+  },
+  {
+    path: "/properties/:propertyId/edit",
+    component: PropertyEdit,
+    meta: setMeta(false, false), // TODO: 한지윤 인증 머지 완료 후 setMeta(true, false, [USER_ROLE.USER, USER_ROLE.AGENT, USER_ROLE.ADMIN])
+  },
+  // ============================================================
   {
     path: "/sign-in",
     component: SignIn,
@@ -76,7 +91,7 @@ router.beforeEach(async (to, from, next) => {
     try {
       await authStore.reissue();
     } catch {
-      throw error;
+      // 토큰 재발급 실패: 게스트 상태로 진행
     }
   }
 
