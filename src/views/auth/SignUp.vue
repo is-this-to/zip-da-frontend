@@ -10,8 +10,6 @@ import signUpValidator from "../../util/validator/domain/auth/signUpValidator.js
 const router = useRouter();
 const authStore = useAuthStore();
 
-const notYet = () => alert("2차 구현 예정입니다.");
-
 const signUpForm = reactive({
   email: null,
   password: null,
@@ -33,12 +31,22 @@ const submitSignup = async () => {
   // 유효성 검사
   const emailValResult = signUpValidator.email(signUpForm.email);
   const passwordValResult = signUpValidator.password(signUpForm.password);
-  const passwordCkValResult = signUpValidator.passwordCk(signUpForm.password, signUpForm.passwordCk);
+  const passwordCkValResult = signUpValidator.passwordCk(
+    signUpForm.password,
+    signUpForm.passwordCk,
+  );
   const nameValResult = signUpValidator.name(signUpForm.name);
   const nickValResult = signUpValidator.nick(signUpForm.nick);
   const phoneValResult = signUpValidator.phone(signUpForm.phone);
   // 유효성 성공하면 if절
-  if (!emailValResult && !passwordValResult && !passwordCkValResult && !nameValResult && !nickValResult && !phoneValResult) {
+  if (
+    !emailValResult &&
+    !passwordValResult &&
+    !passwordCkValResult &&
+    !nameValResult &&
+    !nickValResult &&
+    !phoneValResult
+  ) {
     try {
       isSubmitting.value = true;
       errorMessage.value = "";
@@ -46,13 +54,22 @@ const submitSignup = async () => {
       router.replace("/sign-in");
     } catch (error) {
       if (error.response) {
-        errorMessage.value = error.response.data.data || "회원가입에 실패했습니다. 다시 시도해주세요.";
+        errorMessage.value =
+          error.response.data.data ||
+          "회원가입에 실패했습니다. 다시 시도해주세요.";
       }
     } finally {
       isSubmitting.value = false;
     }
   } else {
-    const validationMessages = [emailValResult, passwordValResult, passwordCkValResult, nameValResult, nickValResult, phoneValResult].filter(Boolean);
+    const validationMessages = [
+      emailValResult,
+      passwordValResult,
+      passwordCkValResult,
+      nameValResult,
+      nickValResult,
+      phoneValResult,
+    ].filter(Boolean);
     errorMessage.value = validationMessages.join("\n");
   }
 };
@@ -62,14 +79,21 @@ const submitSignup = async () => {
   <main class="signup-page">
     <section class="signup-shell">
       <div class="brand-panel">
-        <RouterLink to="/main" class="brand-mark" aria-label="집다 메인으로 이동">
+        <RouterLink
+          to="/main"
+          class="brand-mark"
+          aria-label="집다 메인으로 이동"
+        >
           <strong>ZIPDA</strong>
         </RouterLink>
 
         <div class="brand-copy">
           <p class="eyebrow">Welcome</p>
           <h1>좋은 집을 찾는 여정을<br />시작하세요.</h1>
-          <p>회원가입하고 관심 매물 저장, 검색 조건 관리, 매물 등록까지 JIPDA에서 시작하세요.</p>
+          <p>
+            회원가입하고 관심 매물 저장, 검색 조건 관리, 매물 등록까지 JIPDA에서
+            시작하세요.
+          </p>
         </div>
       </div>
 
@@ -79,15 +103,62 @@ const submitSignup = async () => {
           <h2>회원가입</h2>
           <span>집다 계정으로 안전하게 접속하세요.</span>
         </div>
-        <MyInput :content="'이메일'" :input-type="'email'" :auth-complete="'email'" :placeholder="'example@zipda.com'" :required="true" v-model="signUpForm.email"></MyInput>
-        <MyInput :content="'비밀번호'" :placeholder="'8~20자 / 영문, 숫자, 특수문자 포함'" :required="true" :auth-complete="'new-password'" v-model="signUpForm.password" v-model:is-show-password="showPassword" :is-pass-word="true"></MyInput>
-        <MyInput :content="'비밀번호 확인'" :placeholder="'비밀번호 재입력'" :required="true" v-model="signUpForm.passwordCk" v-model:is-show-password="showPasswordCk" :is-pass-word="true" :auth-complete="'new-password'"></MyInput>
-        <MyInput :content="'이름'" :auth-complete="'name'" :placeholder="'이름 입력'" :required="true" v-model="signUpForm.name"></MyInput>
-        <MyInput :content="'닉네임'" :auth-complete="'nick'" :placeholder="'2~20자 닉네임'" :required="true" v-model="signUpForm.nick"></MyInput>
-        <MyInput :content="'번호'" :auth-complete="'tel'" :placeholder="'01012345678'" :required="false" v-model="signUpForm.phone"></MyInput>
+        <MyInput
+          :content="'이메일'"
+          :input-type="'email'"
+          :auth-complete="'email'"
+          :placeholder="'example@zipda.com'"
+          :required="true"
+          v-model="signUpForm.email"
+        ></MyInput>
+        <MyInput
+          :content="'비밀번호'"
+          :placeholder="'8~20자 / 영문, 숫자, 특수문자 포함'"
+          :required="true"
+          :auth-complete="'new-password'"
+          v-model="signUpForm.password"
+          v-model:is-show-password="showPassword"
+          :is-pass-word="true"
+        ></MyInput>
+        <MyInput
+          :content="'비밀번호 확인'"
+          :placeholder="'비밀번호 재입력'"
+          :required="true"
+          v-model="signUpForm.passwordCk"
+          v-model:is-show-password="showPasswordCk"
+          :is-pass-word="true"
+          :auth-complete="'new-password'"
+        ></MyInput>
+        <MyInput
+          :content="'이름'"
+          :auth-complete="'name'"
+          :placeholder="'이름 입력'"
+          :required="true"
+          v-model="signUpForm.name"
+        ></MyInput>
+        <MyInput
+          :content="'닉네임'"
+          :auth-complete="'nick'"
+          :placeholder="'2~20자 닉네임'"
+          :required="true"
+          v-model="signUpForm.nick"
+        ></MyInput>
+        <MyInput
+          :content="'번호'"
+          :auth-complete="'tel'"
+          :placeholder="'01012345678'"
+          :required="false"
+          v-model="signUpForm.phone"
+        ></MyInput>
 
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-        <MyButton :content="isSubmitting ? '회원가입 중...' : '회원가입'" :color="'blue'" :size="'middle'" :class="'submit-button'" :btn-type="'submit'"></MyButton>
+        <MyButton
+          :content="isSubmitting ? '회원가입 중...' : '회원가입'"
+          :color="'blue'"
+          :size="'middle'"
+          :class="'submit-button'"
+          :btn-type="'submit'"
+        ></MyButton>
 
         <!-- <div class="divider">
           <span></span>
@@ -120,7 +191,10 @@ const submitSignup = async () => {
   place-items: center;
   padding: 48px 24px;
   color: #121826;
-  background: radial-gradient(circle at 22% 18%, #ff624d33, transparent 30%), radial-gradient(circle at 76% 82%, #0064ff2e, transparent 28%), linear-gradient(135deg, #eef3ff 0%, #f8fbff 46%, #eef2f8 100%);
+  background:
+    radial-gradient(circle at 22% 18%, #ff624d33, transparent 30%),
+    radial-gradient(circle at 76% 82%, #0064ff2e, transparent 28%),
+    linear-gradient(135deg, #eef3ff 0%, #f8fbff 46%, #eef2f8 100%);
 }
 
 .signup-shell {
@@ -144,7 +218,9 @@ const submitSignup = async () => {
   padding: 42px;
   overflow: hidden;
   color: #ffffff;
-  background: linear-gradient(160deg, #041534e6, #0057e7d1), linear-gradient(135deg, #0f172a, #0057e7);
+  background:
+    linear-gradient(160deg, #041534e6, #0057e7d1),
+    linear-gradient(135deg, #0f172a, #0057e7);
 }
 
 .brand-panel::before,

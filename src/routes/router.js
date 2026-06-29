@@ -15,6 +15,7 @@ import agentApprovedStatus from "../constants/agentApprovedStatus.js";
 import PropertyCreate from "../views/property/PropertyCreate.vue";
 import PropertyEdit from "../views/property/PropertyEdit.vue";
 import PropertyDetail from "../views/property/PropertyDetail.vue";
+import ErrorPage from "../views/error/ErrorPage.vue";
 
 // 팀원 각자파트 권한을 나눠서 routes 컴포넌트 경로 적어주세요
 const setMeta = (requiresAuth, guestOnly, roles = []) => {
@@ -88,6 +89,11 @@ const routes = [
     component: AgentApply,
     meta: setMeta(true, false, [USER_ROLE.USER]),
   },
+  {
+    path: "/errors",
+    component: ErrorPage,
+    meta: setMeta(false, false),
+  },
 ];
 
 const router = createRouter({
@@ -109,16 +115,20 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  let role = authStore.role;
-
   // 로그인, 회원가입처럼 "비회원만" 들어갈 수 있는 페이지를 들어갈때
   if (to.meta.guestOnly && authStore.isLoggedIn) {
     return next("/");
   }
 
   // admin 권한이 필요한 페이지로 가는데 role이 admin이 아닌경우
-  if (to.meta.roles.includes(USER_ROLE.ADMIN) && role != USER_ROLE.ADMIN) {
-    return next("/admins/sign-in");
+  if (to.meta.roles.includes(USER_ROLE.ADMIN)) {
+    if (!authStore.adminAuthInitialized) {
+      await authStore.adminReissue();
+    }
+
+    if (authStore.role !== USER_ROLE.ADMIN) {
+      return next("/admins/sign-in");
+    }
   }
 
   // 로그인이 필요한 페이지인데 로그인 안 한 경우
@@ -127,11 +137,26 @@ router.beforeEach(async (to, from, next) => {
   }
 
   // 중개사 권한이 필요한데 중개사 권한이 없는 경우
-  if (to.meta.roles.includes(USER_ROLE.AGENT) && role != USER_ROLE.AGENT) {
+  if (
+    to.meta.roles.includes(USER_ROLE.AGENT) &&
+    authStore.role != USER_ROLE.AGENT
+  ) {
     // 로그인 자체를 안 한 사용자 -> 회원가입 화면으로 이동
     if (authStore.role === null) {
       return next("/sign-in");
     }
+
+    if (
+      useAgentStore.approvedStatus ===
+      agentApprovedStatus.agentApprovedStatus.PENDING
+    ) {
+      try {
+        await agentStore.checkAgentInfo();
+      } catch (error) {
+        throw error;
+      }
+    }
+
     // Agent 권한이 없는 사용자가 접근 -> 중개사 인증 페이지로 이동
     if (authStore.role === USER_ROLE.USER) {
       return next("/agents/apply");
@@ -159,7 +184,7 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 
-  if (to.meta.roles.length > 0 && !to.meta.roles.includes(role)) {
+  if (to.meta.roles.length > 0 && !to.meta.roles.includes(authStore.role)) {
     //특정 권한이 필요한데 없는 경우 메인페이지로 이동
     alert("권한이 없습니다.");
     return next("/");

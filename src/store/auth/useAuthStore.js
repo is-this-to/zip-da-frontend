@@ -9,6 +9,7 @@ export const useAuthStore = defineStore("authStore", () => {
   const accessToken = ref("");
   const userInfo = ref(null);
   const authInitialized = ref(false);
+  const adminAuthInitialized = ref(false);
 
   // 2. Getters
   const role = computed(() => {
@@ -105,12 +106,27 @@ export const useAuthStore = defineStore("authStore", () => {
     }
   };
 
+  const adminReissue = async () => {
+    try {
+      const url = "/api/admin/auth/tokens";
+      const res = await myAxios.post(url);
+      accessToken.value = res.data.data.accessToken;
+      userInfo.value = res.data.data.principal;
+      isLoggedIn.value = true;
+    } catch (error) {
+      clearAuthStore();
+    } finally {
+      adminAuthInitialized.value = true;
+    }
+  };
+
   return {
     // State
     isLoggedIn,
     accessToken,
     userInfo,
     authInitialized,
+    adminAuthInitialized,
 
     // Getter
     role,
@@ -121,5 +137,6 @@ export const useAuthStore = defineStore("authStore", () => {
     logout,
     registration,
     adminLogin,
+    adminReissue,
   };
 });

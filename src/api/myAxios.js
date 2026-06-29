@@ -2,6 +2,7 @@ import axios from "axios";
 import { useAuthStore } from "../store/auth/useAuthStore";
 import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";
+import { USER_ROLE } from "../constants/user/role";
 
 const myAxios = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -18,7 +19,7 @@ const myAxios = axios.create({
 myAxios.interceptors.request.use(async (config) => {
   const authStore = useAuthStore();
   let accessToken = authStore.accessToken;
-  const denyUrl = /^\/api\/auth\/tokens$/; // reissue 요청일 경우 요청 금지
+  const denyUrl = /^\/api\/(?:admin\/)?auth\/tokens$/; // reissue 요청일 경우 요청 금지
 
   if (!denyUrl.test(config.url) && authStore.isLoggedIn) {
     // 액세스 토큰 만료 확인
@@ -29,7 +30,11 @@ myAxios.interceptors.request.use(async (config) => {
     const extTime = dayjs.unix(claims.exp).add(-2, "minute").unix();
     if (now >= extTime) {
       try {
-        await authStore.reissue();
+        if (authStore.role === USER_ROLE.ADMIN) {
+          await authStore.adminReissue();
+        } else {
+          await authStore.reissue();
+        }
         accessToken = authStore.accessToken;
       } catch (error) {
         throw error;

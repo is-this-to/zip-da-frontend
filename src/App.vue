@@ -12,7 +12,7 @@ const authStore = useAuthStore();
 </script>
 
 <template>
-  <Header v-if="authStore.authInitialized && !isAdminPage" />
+  <Header v-if="!isAdminPage" />
   <router-view></router-view>
   <Footer v-if="!isAdminPage"></Footer>
 </template>

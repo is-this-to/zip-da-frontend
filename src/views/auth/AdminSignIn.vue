@@ -35,7 +35,7 @@ const submitLogin = async () => {
 
       await authStore.adminLogin(adminSignInForm);
 
-      router.push("/admins");
+      router.replace("/admins");
     } catch (error) {
       errorMessage.value = "관리자 이메일 또는 비밀번호를 확인해 주세요.";
     } finally {

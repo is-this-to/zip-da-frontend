@@ -4,9 +4,11 @@ import MyButton from "./button/MyButton.vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../store/auth/useAuthStore.js";
 import { storeToRefs } from "pinia";
+import { useMyErrorStore } from "../store/error/useMyErrorStore.js";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const errorStore = useMyErrorStore();
 
 const guestNavItems = [
   {
@@ -40,6 +42,7 @@ const redirectLogin = () => {
   router.push("/sign-in");
 };
 const redirectMain = () => {
+  errorStore.clearErrorInfo();
   router.push("/main");
 };
 
