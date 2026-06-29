@@ -18,6 +18,7 @@ export default (form) => {
   apply("roomCount", form.roomCount);
   apply("bathroomCount", form.bathroomCount);
   apply("imageUrls", form.imageUrls);
+  apply("detailAddress", form.detailAddress);
 
   return errors;
 };
