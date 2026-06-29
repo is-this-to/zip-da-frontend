@@ -2,12 +2,30 @@
 import { computed, onMounted } from "vue";
 import { usePropertySearchStore } from "../../store/property/usePropertySearchStore";
 import { useRouter } from "vue-router";
+import transactionTypeCode from "../../constants/transactionTypeCode";
+import propertyType from "../../constants/propertyType";
+import PropertyFilter from "./filter/PropertyFilter.vue";
+import { formatKoreanCurrency } from "../../util/formatter/useCurrency.js";
 
 const router = useRouter();
 const propertySearchStore = usePropertySearchStore();
 
+const getTransactionName = transactionTypeCode.getTransactionTypeName;
+const getPropertyName = propertyType.getPropertyTypeName;
+
+// formatMoney 삭제 후 formatKoreanCurrency 추가
+// const formatMoney = (money) => {
+//   if (!money) return "0";
+//   // toLocaleString() : 숫자나 날짜를 '사용자가 살고 있는 지열(Locale)의 표기방식'에 맞춰 문자열로 변환해 주는 내장 메서드
+//   // 핵심기능
+//   // 1. 자동으로 천 단위 콤마 찍기
+//   // 2. 국가별 맞춤 표기(Locale설정)
+//   // 3. 통화(원, 달러) 기호까지 한 번에 붙이기
+//   return money.toLocaleString();
+// };
+
 // --- 페이지네이션 로직 ---
-const pageBlockSize = 5;
+const pageBlockSize = 5; // 전체 보여질 페이지버튼 갯수
 
 const totalPages = computed(() => {
   if (propertySearchStore.pageSize === 0) return 0;
@@ -53,6 +71,7 @@ onMounted(() => {
 
 <template>
   <div class="property-container">
+    <PropertyFilter />
     <div class="summary">
       <p>
         총 <strong class="highlight">{{ propertySearchStore.total }}</strong
@@ -70,10 +89,26 @@ onMounted(() => {
       >
         <div class="info-box">
           <h3 class="price">
-            {{ item.transactionType === "JEONSE" ? "전세" : "월세" }}
-            {{ item.deposit }} / {{ item.monthlyRent }}
+            <span class="badge">{{
+              getTransactionName(item.transactionType)
+            }}</span>
+            <template v-if="item.transactionType === 'SALE'">
+              {{ formatKoreanCurrency(item.price) }}
+            </template>
+
+            <template v-else-if="item.transactionType === 'JEONSE'">
+              {{ formatKoreanCurrency(item.deposit) }}
+            </template>
+
+            <template v-else>
+              {{ formatKoreanCurrency(item.deposit) }} /
+              {{ formatKoreanCurrency(item.monthlyRent) }}
+            </template>
           </h3>
-          <p class="desc">{{ item.description }}</p>
+          <p class="desc">
+            [{{ getPropertyName(item.propertyType) }}] {{ item.description }}
+          </p>
+
           <p class="sub-info">
             {{ item.regionName }} | 층수: {{ item.floor }}층 |
             {{ item.areaM2 }}㎡
@@ -122,7 +157,6 @@ onMounted(() => {
   font-size: 16px;
 }
 
-/* 지정하신 글로벌 컬러 사용 */
 .highlight {
   color: var(--personal-color-blue);
 }
@@ -150,10 +184,20 @@ onMounted(() => {
   background-size: cover;
 
   /* 카드 높이 및 텍스트 하단 배치 */
-  min-height: 320px;
+  /* 수정: min-height: 320px; 삭제 후 aspect-ratio 추가 */
+  aspect-ratio: 4 / 5;
+
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.card-wrapper:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(141, 162, 231, 0.3);
+  cursor: pointer;
 }
 
 /* 텍스트 정보 영역 (배경 이미지 위에서 잘 보이도록 처리) */
