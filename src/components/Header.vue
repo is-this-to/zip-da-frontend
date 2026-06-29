@@ -28,7 +28,7 @@ const userNavItems = [
   },
   {
     content: "매물 등록",
-    path: "/properties/new",
+    path: "/properties/create",
   },
   {
     content: "공인중개사 페이지",
@@ -37,10 +37,10 @@ const userNavItems = [
 ];
 
 const redirectLogin = () => {
-  router.push("sign-in");
+  router.push("/sign-in");
 };
 const redirectMain = () => {
-  router.push("main");
+  router.push("/main");
 };
 
 const { isLoggedIn } = storeToRefs(authStore);
