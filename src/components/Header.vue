@@ -28,7 +28,7 @@ const userNavItems = [
   },
   {
     content: "매물 등록",
-    path: "/",
+    path: "/properties/create",
   },
   {
     content: "공인중개사 페이지",

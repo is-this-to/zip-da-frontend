@@ -12,6 +12,9 @@ import AgentApply from "../views/agent/AgentApply.vue";
 import AgentPage from "../views/agent/AgentPage.vue";
 import { useAgentStore } from "../store/agent/useAgentStore.js";
 import agentApprovedStatus from "../constants/agentApprovedStatus.js";
+import PropertyCreate from "../views/property/PropertyCreate.vue";
+import PropertyEdit from "../views/property/PropertyEdit.vue";
+import PropertyDetail from "../views/property/PropertyDetail.vue";
 
 // 팀원 각자파트 권한을 나눠서 routes 컴포넌트 경로 적어주세요
 const setMeta = (requiresAuth, guestOnly, roles = []) => {
@@ -40,9 +43,21 @@ const routes = [
   },
   {
     path: "/properties/:propertyId",
-    component: PropertyShow,
+    component: PropertyDetail,
     meta: setMeta(false, false),
   },
+  // ============ 매물 도메인 (담당: 임호탁 / feature/property_LHT) ============
+  {
+    path: "/properties/create",
+    component: PropertyCreate,
+    meta: setMeta(false, false), // TODO: 한지윤 인증 머지 완료 후 setMeta(true, false, [USER_ROLE.USER, USER_ROLE.AGENT, USER_ROLE.ADMIN])
+  },
+  {
+    path: "/properties/:propertyId/edit",
+    component: PropertyEdit,
+    meta: setMeta(false, false), // TODO: 한지윤 인증 머지 완료 후 setMeta(true, false, [USER_ROLE.USER, USER_ROLE.AGENT, USER_ROLE.ADMIN])
+  },
+  // ============================================================
   {
     path: "/sign-in",
     component: SignIn,
@@ -90,7 +105,7 @@ router.beforeEach(async (to, from, next) => {
     try {
       await authStore.reissue();
     } catch {
-      throw error;
+      // 토큰 재발급 실패: 게스트 상태로 진행
     }
   }
 
@@ -124,11 +139,21 @@ router.beforeEach(async (to, from, next) => {
   }
 
   // 이미 신청해서 PENDING or APPROVED 상태일때 중개사 인증 페이지로 이동불가
-  if (to.path === "/agents/apply" && agentStore.approvedStatus !== agentApprovedStatus.agentApprovedStatus.REJECTED) {
-    if (agentStore.approvedStatus === agentApprovedStatus.agentApprovedStatus.PENDING) {
+  if (
+    to.path === "/agents/apply" &&
+    agentStore.approvedStatus !==
+      agentApprovedStatus.agentApprovedStatus.REJECTED
+  ) {
+    if (
+      agentStore.approvedStatus ===
+      agentApprovedStatus.agentApprovedStatus.PENDING
+    ) {
       alert("이미 중개사 인증 신청이 접수되어 관리자 심사 중입니다.");
     }
-    if (agentStore.approvedStatus === agentApprovedStatus.agentApprovedStatus.APPROVED) {
+    if (
+      agentStore.approvedStatus ===
+      agentApprovedStatus.agentApprovedStatus.APPROVED
+    ) {
       alert("현재 이미 공인중개사 권한이 있습니다");
       return "/";
     }
