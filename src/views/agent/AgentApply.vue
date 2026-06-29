@@ -45,12 +45,14 @@ const submitApply = async () => {
         licenseNo: applyForm.licenseNo.replace(/\D/g, ""),
         businessNo: applyForm.businessNo.replace(/\D/g, ""),
         officeName: applyForm.officeName.trim(),
+        agentImageUrl: applyForm.agentImageUrl,
       };
 
       await agentStore.applyAgent(newApplyForm);
       await router.replace("/");
     } catch (error) {
-      myErrorStore.errorMessage.value =
+      if (myErrorStore.redirectErrorPage(error)) return;
+      errorMessage.value =
         error.response?.data?.data ?? "신청 처리 중 오류가 발생했습니다.";
     } finally {
       isSubmitting.value = false;
@@ -74,8 +76,11 @@ const handleChangeProfile = async (e) => {
       URL.revokeObjectURL(preview.value);
     }
     // API 서버에 파일 저장 요청
-    const fileUri = await fileStore.storeAgentProfile(file);
-
+    try {
+      const fileUri = await fileStore.storeAgentProfile(file);
+    } catch (error) {
+      if (myErrorStore.redirectErrorPage(error)) return;
+    }
     if (fileUri) {
       applyForm.agentImageUrl = fileUri;
       preview.value = URL.createObjectURL(file);

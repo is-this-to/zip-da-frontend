@@ -11,10 +11,9 @@ export const useMyErrorStore = defineStore("myErrorStore", () => {
 
   // 3. Actions (function)
   const setErrorInfo = (error) => {
-    // ?. : error에 response가 있으면 data에 접근하고 없으면 접근 하지 마라
-    const errorData = error.response?.data || {
+    const errorData = error?.response?.data || {
       code: "UNKNOWN_ERROR",
-      message: "예기치 못한 에러 발생했습니다",
+      data: "예기치 못한 에러 발생했습니다",
     };
     errorCode.value = errorData.code;
     errorMsg.value = errorData.data;
@@ -28,13 +27,12 @@ export const useMyErrorStore = defineStore("myErrorStore", () => {
   };
 
   const redirectErrorPage = (error) => {
-    const errorCode = error.response?.data?.code;
-    if (!["E80", "E99"].includes(errorCode)) {
+    const code = error?.response?.data?.code;
+    if (!["E80", "E99"].includes(code)) {
       return false;
     }
-    myErrorStore.setErrorInfo(error);
-    router.replace("/errors");
 
+    setErrorInfo(error);
     return true;
   };
 

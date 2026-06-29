@@ -42,7 +42,6 @@ const redirectLogin = () => {
   router.push("/sign-in");
 };
 const redirectMain = () => {
-  errorStore.clearErrorInfo();
   router.push("/main");
 };
 

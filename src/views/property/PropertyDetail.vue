@@ -16,10 +16,12 @@ import {
 } from "../../constants/propertyEnums";
 import { useAuthStore } from "../../store/auth/useAuthStore";
 import { formatKoreanCurrency } from "../../util/formatter/useCurrency.js";
+import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const myErrorStore = useMyErrorStore();
 
 const property = ref(null);
 const isLoading = ref(true);
@@ -88,7 +90,7 @@ const fetchProperty = async () => {
   try {
     property.value = await getPropertyDetail(propertyId.value);
   } catch (error) {
-    console.error("매물 상세 조회 실패:", error);
+    if (myErrorStore.redirectErrorPage(error)) return;
     errorMessage.value =
       error.response?.data?.message || "매물 정보를 불러올 수 없습니다.";
   } finally {
@@ -120,7 +122,7 @@ const handleStatusChange = async (newStatus) => {
     alert("거래 상태가 변경되었습니다.");
     await fetchProperty();
   } catch (error) {
-    console.error("거래상태 변경 실패:", error);
+    if (myErrorStore.redirectErrorPage(error)) return;
     alert(error.response?.data?.message || "변경에 실패했습니다.");
   }
 };

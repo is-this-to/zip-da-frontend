@@ -6,9 +6,11 @@ import MyButton from "../../components/button/MyButton.vue";
 import MyInput from "../../components/input/MyInput.vue";
 import { name, passwordCk } from "../../util/validator/rule/userAuthRule.js";
 import signUpValidator from "../../util/validator/domain/auth/signUpValidator.js";
+import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const myErrorStore = useMyErrorStore();
 
 const signUpForm = reactive({
   email: null,
@@ -53,6 +55,7 @@ const submitSignup = async () => {
       await authStore.registration(signUpForm);
       router.replace("/sign-in");
     } catch (error) {
+      if (myErrorStore.redirectErrorPage(error)) return;
       if (error.response) {
         errorMessage.value =
           error.response.data.data ||

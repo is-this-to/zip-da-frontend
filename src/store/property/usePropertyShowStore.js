@@ -14,6 +14,7 @@ export const usePropertyShowStore = defineStore("propertyShowStore", () => {
 
       property.value = result.data.data;
     } catch (error) {
+      throw error;
       // console.error("매물 상세 정보를 불러오는데 실패했습니다.", error);
       // alert("매물 정보를 불러올 수 없습니다.");
       throw error; //TODO:에러처리

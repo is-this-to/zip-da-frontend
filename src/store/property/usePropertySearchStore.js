@@ -48,7 +48,7 @@ export const usePropertySearchStore = defineStore("propertySearch", () => {
       currentPage.value = data.currentPage;
       lastPage.value = data.lastPage;
     } catch (error) {
-      console.error(error);
+      throw error;
     }
   };
 
