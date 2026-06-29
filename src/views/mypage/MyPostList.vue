@@ -94,9 +94,13 @@ onMounted(loadPosts);
     </div>
 
     <div v-else-if="!filteredPosts.length" class="state">
-      <b>{{ filter === "ALL" ? "등록한 게시물이 없어요" : "해당 상태의 게시물이 없어요" }}</b>
+      <b>{{
+        filter === "ALL"
+          ? "등록한 게시물이 없어요"
+          : "해당 상태의 게시물이 없어요"
+      }}</b>
       <p>새 매물을 등록하면 이곳에서 상태를 관리할 수 있어요.</p>
-      <RouterLink to="/properties/new">매물 등록하기</RouterLink>
+      <RouterLink to="/properties/create">매물 등록하기</RouterLink>
     </div>
 
     <div v-else class="post-list">
@@ -106,7 +110,11 @@ onMounted(loadPosts);
         class="post-card"
       >
         <RouterLink :to="`/properties/${post.propertyId}`" class="thumb">
-          <img v-if="post.thumbnailUrl" :src="post.thumbnailUrl" alt="매물 이미지" />
+          <img
+            v-if="post.thumbnailUrl"
+            :src="post.thumbnailUrl"
+            alt="매물 이미지"
+          />
           <span v-else>ZIPDA</span>
         </RouterLink>
 
@@ -127,7 +135,9 @@ onMounted(loadPosts);
 
         <div class="actions">
           <RouterLink :to="`/properties/${post.propertyId}`">보기</RouterLink>
-          <RouterLink :to="`/properties/${post.propertyId}/edit`">수정</RouterLink>
+          <RouterLink :to="`/properties/${post.propertyId}/edit`"
+            >수정</RouterLink
+          >
         </div>
       </article>
     </div>
