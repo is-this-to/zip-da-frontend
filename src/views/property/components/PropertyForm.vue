@@ -22,6 +22,23 @@ const showMonthlyRent = computed(() =>
   ["MONTHLY_RENT", "SHORT_TERM"].includes(form.value.transactionType),
 );
 
+// 가격 콤마 포맷용 (MyInput 의 v-model 과 양방향 연결)
+const formatPrice = (key) =>
+  computed({
+    get() {
+      const val = form.value[key];
+      if (val === null || val === undefined || val === "") return "";
+      return Number(val).toLocaleString("ko-KR");
+    },
+    set(newVal) {
+      const cleaned = String(newVal).replace(/[^\d]/g, "");
+      form.value[key] = cleaned === "" ? null : Number(cleaned);
+    },
+  });
+
+const priceDisplay = formatPrice("price");
+const depositDisplay = formatPrice("deposit");
+
 const monthlyRentDisplay = formatPrice("monthlyRent");
 const maintenanceFeeDisplay = formatPrice("maintenanceFee");
 

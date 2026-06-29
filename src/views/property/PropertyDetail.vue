@@ -15,6 +15,7 @@ import {
   getLabel,
 } from "../../constants/propertyEnums";
 import { useAuthStore } from "../../store/auth/useAuthStore";
+import { formatKoreanCurrency } from "../../util/formatter/useCurrency.js";
 
 const route = useRoute();
 const router = useRouter();
