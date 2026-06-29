@@ -1,7 +1,6 @@
-import axios from "axios";
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import myAxios from "../../api/myAxios"; // 본인 프로젝트 경로에 맞게 확인해주세요!
+import myAxios from "../../api/myAxios";
 
 export const usePropertySearchStore = defineStore("propertySearch", () => {
   const items = ref([]);
@@ -13,7 +12,6 @@ export const usePropertySearchStore = defineStore("propertySearch", () => {
 
   // 1. keyword 필드가 추가된 검색 필터 객체
   const searchFilters = ref({
-    keyword: "", // 지역/단지명 검색용
     propertyType: null,
     transactionType: null,
     status: null,
@@ -32,8 +30,15 @@ export const usePropertySearchStore = defineStore("propertySearch", () => {
       const params = {
         page: page,
         pageSize: pageSize.value,
-        ...searchFilters.value,
       };
+
+      // 데이터 클렌징 로직
+      // Object.entries() : 객체를 배열(이차원 배열: key, value)로 바꿔주는 메서드
+      Object.entries(searchFilters.value).forEach(([key, value]) => {
+        if (value !== null && value !== "") {
+          params[key] = value;
+        }
+      });
 
       const response = await myAxios.get(url, { params });
       const data = response.data.data;
@@ -47,10 +52,9 @@ export const usePropertySearchStore = defineStore("propertySearch", () => {
     }
   };
 
-  // 2. 대망의 필터 초기화 함수! (여기서 싹 비우고 1페이지 다시 검색)
+  // 필터 초기화
   const resetFilters = () => {
     searchFilters.value = {
-      keyword: "",
       propertyType: null,
       transactionType: null,
       status: null,
@@ -62,7 +66,7 @@ export const usePropertySearchStore = defineStore("propertySearch", () => {
       minMonthlyRent: null,
       maxMonthlyRent: null,
     };
-    searchPropertyPagination(1);
+    searchPropertyPagination();
   };
 
   return {
@@ -73,6 +77,6 @@ export const usePropertySearchStore = defineStore("propertySearch", () => {
     lastPage,
     searchFilters,
     searchPropertyPagination,
-    resetFilters, // 3. 꼭 return에 넣어줘야 컴포넌트에서 쓸 수 있습니다!
+    resetFilters,
   };
 });

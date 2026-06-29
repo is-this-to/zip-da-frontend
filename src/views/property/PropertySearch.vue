@@ -5,16 +5,24 @@ import { useRouter } from "vue-router";
 import transactionTypeCode from "../../constants/transactionTypeCode";
 import propertyType from "../../constants/propertyType";
 import PropertyFilter from "./filter/PropertyFilter.vue";
+import { formatKoreanCurrency } from "../../util/formatter/useCurrency.js";
+
 const router = useRouter();
 const propertySearchStore = usePropertySearchStore();
 
 const getTransactionName = transactionTypeCode.getTransactionTypeName;
 const getPropertyName = propertyType.getPropertyTypeName;
 
-const formatMoney = (money) => {
-  if (!money) return "0";
-  return money.toLocaleString();
-};
+// formatMoney 삭제 후 formatKoreanCurrency 추가
+// const formatMoney = (money) => {
+//   if (!money) return "0";
+//   // toLocaleString() : 숫자나 날짜를 '사용자가 살고 있는 지열(Locale)의 표기방식'에 맞춰 문자열로 변환해 주는 내장 메서드
+//   // 핵심기능
+//   // 1. 자동으로 천 단위 콤마 찍기
+//   // 2. 국가별 맞춤 표기(Locale설정)
+//   // 3. 통화(원, 달러) 기호까지 한 번에 붙이기
+//   return money.toLocaleString();
+// };
 
 // --- 페이지네이션 로직 ---
 const pageBlockSize = 5; // 전체 보여질 페이지버튼 갯수
@@ -85,16 +93,16 @@ onMounted(() => {
               getTransactionName(item.transactionType)
             }}</span>
             <template v-if="item.transactionType === 'SALE'">
-              {{ formatMoney(item.price) }}원
+              {{ formatKoreanCurrency(item.price) }}
             </template>
 
             <template v-else-if="item.transactionType === 'JEONSE'">
-              {{ formatMoney(item.deposit) }}원
+              {{ formatKoreanCurrency(item.deposit) }}
             </template>
 
             <template v-else>
-              {{ formatMoney(item.deposit) }}원 /
-              {{ formatMoney(item.monthlyRent) }}원
+              {{ formatKoreanCurrency(item.deposit) }} /
+              {{ formatKoreanCurrency(item.monthlyRent) }}
             </template>
           </h3>
           <p class="desc">
@@ -176,7 +184,9 @@ onMounted(() => {
   background-size: cover;
 
   /* 카드 높이 및 텍스트 하단 배치 */
-  min-height: 320px;
+  /* 수정: min-height: 320px; 삭제 후 aspect-ratio 추가 */
+  aspect-ratio: 4 / 5;
+
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
