@@ -16,6 +16,7 @@ import {
 } from "../../constants/propertyEnums";
 import { useAuthStore } from "../../store/auth/useAuthStore";
 import { formatKoreanCurrency } from "../../util/formatter/useCurrency.js";
+import ReportModal from "./ReportModal.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -57,6 +58,13 @@ const isAdmin = computed(() => authStore.role === "ADMIN");
 
 // 수정/삭제 가능?
 const canEdit = computed(() => isOwner.value || isAdmin.value);
+
+// 신고 가능한가?
+const canReport = computed(() => {
+  if (!property.value || !authStore.userInfo) return false;
+  if (property.value.userId === authStore.userInfo.userId) return false;
+  return true;
+});
 
 // 가격 표시 포맷
 const formatPrice = (value) => {
@@ -124,6 +132,12 @@ const handleStatusChange = async (newStatus) => {
     alert(error.response?.data?.message || "변경에 실패했습니다.");
   }
 };
+
+// 신고하기
+const isReportModalOpen = ref(false);
+function openModal() {
+  isReportModalOpen.value = true;
+}
 
 onMounted(() => {
   fetchProperty();
@@ -231,6 +245,17 @@ onMounted(() => {
         <p class="description">{{ property.description }}</p>
       </section>
 
+      <!-- 신고하기 -->
+      <button v-if="canReport" class="report-btn">
+        <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
+          <path
+            d="M0 17V15H2V8C2 6.61667 2.41667 5.3875 3.25 4.3125C4.08333 3.2375 5.16667 2.53333 6.5 2.2V1.5C6.5 1.08333 6.64583 0.729167 6.9375 0.4375C7.22917 0.145833 7.58333 0 8 0C8.41667 0 8.77083 0.145833 9.0625 0.4375C9.35417 0.729167 9.5 1.08333 9.5 1.5V2.2C10.8333 2.53333 11.9167 3.2375 12.75 4.3125C13.5833 5.3875 14 6.61667 14 8V15H16V17H0ZM8 20C7.45 20 6.97917 19.8042 6.5875 19.4125C6.19583 19.0208 6 18.55 6 18H10C10 18.55 9.80417 19.0208 9.4125 19.4125C9.02083 19.8042 8.55 20 8 20ZM4 15H12V8C12 6.9 11.6083 5.95833 10.825 5.175C10.0417 4.39167 9.1 4 8 4C6.9 4 5.95833 4.39167 5.175 5.175C4.39167 5.95833 4 6.9 4 8V15Z"
+            fill="#424656"
+          />
+        </svg>
+        <span @click="openModal"> 신고하기 </span>
+      </button>
+
       <!-- 액션 (작성자 본인 또는 어드민만) -->
       <section v-if="canEdit" class="actions">
         <div class="status-actions">
@@ -266,6 +291,12 @@ onMounted(() => {
       </section>
     </div>
   </main>
+
+  <!-- 신고하기 모달 -->
+  <ReportModal
+    :visible="isReportModalOpen"
+    @close="isReportModalOpen = false"
+  />
 </template>
 
 <style scoped>
@@ -437,6 +468,24 @@ onMounted(() => {
   font-weight: 500;
   line-height: 1.7;
   white-space: pre-line;
+}
+
+/* 신고하기 */
+.report-btn {
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.report-btn svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.25rem;
 }
 
 /* 액션 */
