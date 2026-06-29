@@ -13,8 +13,16 @@ export const updateMyProfile = async (profile) => {
   return response.data;
 };
 
+// 비밀번호 변경
+export const updateMyPassword = async (passwordUpdateRequest) => {
+  const response = await myAxios.patch(
+    "/api/users/me/password",
+    passwordUpdateRequest,
+  );
+  return response.data;
+};
+
 // 공인중개사 프로필 이미지 파일 업로드
-// 실제 파일 저장만 담당하고, DB 저장은 updateMyProfile에서 profileImageUrl로 처리합니다.
 export const uploadAgentProfileImage = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
@@ -40,11 +48,10 @@ export const getMyReports = async () => {
   return response.data;
 };
 
-// 회원탈퇴 API는 백엔드 준비용입니다.
-// 지금 화면에서는 버튼/모달만 만들고 실제 호출하지 않습니다.
+// 회원탈퇴
 export const withdrawMembership = async (password) => {
   const response = await myAxios.delete("/api/users/me", {
-    data: password ? { password } : undefined,
+    data: { password },
   });
   return response.data;
 };

@@ -47,13 +47,16 @@ export const useAuthStore = defineStore("authStore", () => {
     try {
       const url = "/api/auth/tokens";
       const res = await myAxios.post(url);
+
       const data = res.data.data;
       accessToken.value = data.accessToken;
       userInfo.value = data.principal;
       isLoggedIn.value = true;
+
       return true;
     } catch (error) {
       clearAuthStore();
+
       return false;
     } finally {
       authInitialized.value = true;
@@ -75,7 +78,6 @@ export const useAuthStore = defineStore("authStore", () => {
     try {
       const url = "/api/users";
       const res = await myAxios.post(url, newUserData);
-      return;
     } catch (error) {
       throw error;
     }
@@ -116,10 +118,12 @@ export const useAuthStore = defineStore("authStore", () => {
     role,
 
     // Actions
+    clearAuthStore,
     login,
     reissue,
     logout,
     registration,
     adminLogin,
+    adminLogout,
   };
 });

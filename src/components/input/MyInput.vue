@@ -8,6 +8,8 @@ const props = defineProps({
   inputType: {
     type: String,
     default: "text",
+
+    
   },
   required: {
     type: Boolean,

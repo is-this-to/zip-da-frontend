@@ -1,11 +1,13 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from "vue";
-import { useRouter } from "vue-router"; // router.push 사용하려면 꼭 필요
+import { useRouter } from "vue-router";
 import { useAuthStore } from "../../store/auth/useAuthStore";
 import {
   getMyProfile,
   updateMyProfile,
+  updateMyPassword,
   uploadAgentProfileImage,
+  withdrawMembership,
 } from "../../api/myPageApi";
 
 const authStore = useAuthStore();
@@ -15,9 +17,20 @@ const loading = ref(true);
 const saving = ref(false);
 const message = ref("");
 const errorMessage = ref("");
+const withdrawErrorMessage = ref("");
 
 const passwordModalOpen = ref(false); // 비밀번호 변경 모달 열림 여부
 const withdrawModalOpen = ref(false); // 회원탈퇴 모달 열림 여부
+const withdrawCompleteModalOpen = ref(false); // 회원탈퇴 완료 모달 열림 여부
+const modalLoading = ref(false);
+
+const passwordForm = reactive({
+  currentPassword: "",
+  newPassword: "",
+  newPasswordConfirm: "",
+});
+
+const withdrawPassword = ref("");
 
 const photoUrl = ref("");
 const selectedPhotoFile = ref(null);
@@ -27,11 +40,11 @@ const form = reactive({
   nick: "",
   email: "",
   phone: "",
-  role: "", // isAgent에서 사용하니까 처음부터 넣어주는 게 안전함
+  role: "",
 });
 
 let initialForm = "";
-let initialPhotoUrl = ""; // 취소 눌렀을 때 기존 사진으로 되돌리기 위해 필요
+let initialPhotoUrl = "";
 
 const isAgent = computed(() => {
   return authStore.role === "AGENT" || form.role === "AGENT";
@@ -52,7 +65,7 @@ const fillForm = (data = {}) => {
   });
 
   photoUrl.value = data.profileImageUrl ?? "";
-  initialPhotoUrl = photoUrl.value; // 처음 불러온 사진 저장
+  initialPhotoUrl = photoUrl.value;
   selectedPhotoFile.value = null;
   initialForm = JSON.stringify(form);
 };
@@ -94,7 +107,7 @@ const deletePhoto = () => {
 
 const resetForm = () => {
   Object.assign(form, JSON.parse(initialForm));
-  photoUrl.value = initialPhotoUrl; // 기존 사진으로 복구
+  photoUrl.value = initialPhotoUrl;
   selectedPhotoFile.value = null;
   message.value = "변경 내용을 되돌렸습니다.";
   errorMessage.value = "";
@@ -132,7 +145,6 @@ const saveProfile = async () => {
       phone: form.phone,
     };
 
-    // 공인중개사일 때만 프로필 이미지 주소를 보냄
     if (isAgent.value) {
       updatePayload.profileImageUrl = uploadedImageUrl;
     }
@@ -153,6 +165,118 @@ const saveProfile = async () => {
   } finally {
     saving.value = false;
   }
+};
+
+const closePasswordModal = () => {
+  passwordModalOpen.value = false;
+
+  Object.assign(passwordForm, {
+    currentPassword: "",
+    newPassword: "",
+    newPasswordConfirm: "",
+  });
+};
+
+const submitPasswordChange = async () => {
+  message.value = "";
+  errorMessage.value = "";
+
+  if (!passwordForm.currentPassword) {
+    errorMessage.value = "현재 비밀번호를 입력해 주세요.";
+    return;
+  }
+
+  if (!passwordForm.newPassword) {
+    errorMessage.value = "새 비밀번호를 입력해 주세요.";
+    return;
+  }
+
+  if (passwordForm.newPassword !== passwordForm.newPasswordConfirm) {
+    errorMessage.value = "새 비밀번호와 확인 비밀번호가 일치하지 않습니다.";
+    return;
+  }
+
+  try {
+    modalLoading.value = true;
+
+    await updateMyPassword({ ...passwordForm });
+
+    closePasswordModal();
+    message.value = "비밀번호가 변경되었습니다.";
+  } catch (error) {
+    errorMessage.value =
+      error.response?.data?.message || "비밀번호를 변경하지 못했습니다.";
+  } finally {
+    modalLoading.value = false;
+  }
+};
+
+const closeWithdrawModal = () => {
+  // 회원탈퇴 모달 닫기
+  withdrawModalOpen.value = false;
+
+  // 입력한 비밀번호 초기화
+  withdrawPassword.value = "";
+
+  // 회원탈퇴 모달 에러 메시지 초기화
+  withdrawErrorMessage.value = "";
+};
+
+const submitWithdraw = async () => {
+  // 전체 성공/에러 메시지 초기화
+  message.value = "";
+  errorMessage.value = "";
+
+  // 회원탈퇴 모달 안에서 보여줄 에러 메시지 초기화
+  withdrawErrorMessage.value = "";
+
+  // 비밀번호 입력 안 했을 때
+  if (!withdrawPassword.value) {
+    withdrawErrorMessage.value =
+      "회원탈퇴를 진행하려면 비밀번호를 입력해 주세요.";
+    return;
+  }
+
+  // 최종 확인창
+  if (!confirm("정말로 회원탈퇴를 진행하시겠습니까?")) {
+    return;
+  }
+
+  try {
+    // 버튼 로딩 시작
+    modalLoading.value = true;
+
+    // 서버에 회원탈퇴 요청
+    await withdrawMembership(withdrawPassword.value);
+
+    // 성공했을 때만 탈퇴 모달 닫기
+    closeWithdrawModal();
+
+    // 탈퇴 완료 모달 열기
+    withdrawCompleteModalOpen.value = true;
+  } catch (error) {
+    // 인증 실패일 때
+    if (error.response?.status === 401) {
+      withdrawErrorMessage.value =
+        "로그인 정보가 만료되었습니다. 다시 로그인해 주세요.";
+      return;
+    }
+
+    // 그 외 서버 에러 메시지
+    withdrawErrorMessage.value =
+      error.response?.data?.message ||
+      error.response?.data?.data ||
+      "회원탈퇴를 처리하지 못했습니다. 비밀번호 또는 탈퇴 가능 상태를 확인해 주세요.";
+  } finally {
+    // 성공/실패 상관없이 로딩 종료
+    modalLoading.value = false;
+  }
+};
+
+const moveMainAfterWithdraw = () => {
+  withdrawCompleteModalOpen.value = false;
+  authStore.clearAuthStore();
+  router.push("/main");
 };
 
 onMounted(() => {
@@ -191,6 +315,7 @@ onMounted(() => {
             />
             사진 변경
           </label>
+
           <button type="button" @click="deletePhoto">삭제</button>
         </div>
       </div>
@@ -226,10 +351,14 @@ onMounted(() => {
       </div>
     </section>
 
-    <p v-if="message" class="notice success" role="status">{{ message }}</p>
+    <p v-if="message" class="notice success" role="status">
+      {{ message }}
+    </p>
+
     <p v-if="errorMessage" class="notice error" role="alert">
       {{ errorMessage }}
     </p>
+
     <div class="form-actions">
       <button type="button" class="secondary" @click="resetForm">취소</button>
 
@@ -263,6 +392,99 @@ onMounted(() => {
       </button>
     </div>
   </form>
+
+  <div
+    v-if="passwordModalOpen"
+    class="modal-backdrop"
+    @click.self="closePasswordModal"
+  >
+    <section class="modal-card">
+      <button class="modal-close" type="button" @click="closePasswordModal">
+        ×
+      </button>
+
+      <h2>비밀번호 변경</h2>
+      <p>현재 비밀번호 확인 후 새 비밀번호로 변경합니다.</p>
+
+      <form @submit.prevent="submitPasswordChange">
+        <input
+          v-model="passwordForm.currentPassword"
+          type="password"
+          placeholder="현재 비밀번호"
+          autocomplete="current-password"
+        />
+
+        <input
+          v-model="passwordForm.newPassword"
+          type="password"
+          placeholder="새 비밀번호"
+          autocomplete="new-password"
+        />
+
+        <input
+          v-model="passwordForm.newPasswordConfirm"
+          type="password"
+          placeholder="새 비밀번호 확인"
+          autocomplete="new-password"
+        />
+
+        <button class="modal-primary" type="submit" :disabled="modalLoading">
+          {{ modalLoading ? "처리 중…" : "변경하기" }}
+        </button>
+      </form>
+    </section>
+  </div>
+
+  <div
+    v-if="withdrawModalOpen"
+    class="modal-backdrop"
+    @click.self="closeWithdrawModal"
+  >
+    <section class="modal-card">
+      <button class="modal-close" type="button" @click="closeWithdrawModal">
+        ×
+      </button>
+
+      <h2>회원 탈퇴</h2>
+      <p>본인 확인을 위해 비밀번호를 입력해 주세요.</p>
+
+      <form @submit.prevent="submitWithdraw">
+        <input
+          v-model="withdrawPassword"
+          type="password"
+          placeholder="비밀번호"
+          autocomplete="current-password"
+        />
+
+        <p v-if="withdrawErrorMessage" class="notice error" role="alert">
+          {{ withdrawErrorMessage }}
+        </p>
+
+        <button class="modal-danger" type="submit" :disabled="modalLoading">
+          {{ modalLoading ? "처리 중…" : "탈퇴하기" }}
+        </button>
+      </form>
+    </section>
+  </div>
+
+  <div
+    v-if="withdrawCompleteModalOpen"
+    class="modal-backdrop"
+    @click.self="moveMainAfterWithdraw"
+  >
+    <section class="modal-card">
+      <h2>회원 탈퇴 완료</h2>
+      <p>회원탈퇴가 완료되었습니다.</p>
+
+      <button
+        class="modal-primary"
+        type="button"
+        @click="moveMainAfterWithdraw"
+      >
+        확인
+      </button>
+    </section>
+  </div>
 </template>
 
 <style scoped>
@@ -503,5 +725,86 @@ onMounted(() => {
   color: #bd2635;
   border-color: #ffd5da;
   background: #fff7f8;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(24, 34, 51, 0.55);
+}
+
+.modal-card {
+  position: relative;
+  width: min(100%, 420px);
+  padding: 30px;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(19, 32, 56, 0.2);
+}
+
+.modal-card h2 {
+  margin-bottom: 8px;
+  color: #263247;
+}
+
+.modal-card p {
+  margin-bottom: 16px;
+  color: #7b8494;
+  font-size: 13px;
+}
+
+.modal-card input {
+  width: 100%;
+  height: 42px;
+  margin-top: 10px;
+  padding: 0 12px;
+  border: 1px solid #dfe4ec;
+  border-radius: 8px;
+  outline: none;
+}
+
+.modal-card input:focus {
+  border-color: #0064ff;
+  box-shadow: 0 0 0 3px rgba(0, 100, 255, 0.1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  border: 0;
+  background: transparent;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-primary,
+.modal-danger {
+  width: 100%;
+  height: 42px;
+  margin-top: 14px;
+  border: 0;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.modal-primary {
+  background: #0064ff;
+}
+
+.modal-danger {
+  background: #dc3548;
+}
+
+.modal-primary:disabled,
+.modal-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>
