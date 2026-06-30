@@ -100,6 +100,7 @@ const submit = async () => {
           <MyButton
             color="white"
             size="small-middle"
+            style="border-radius: 0.5rem; border: none; font-size: 20px"
             content="취소"
             @click="$emit('close')"
           />
@@ -107,6 +108,7 @@ const submit = async () => {
           <MyButton
             color="blue"
             size="small-middle"
+            style="border-radius: 0.5rem; border: none; font-size: 20px"
             content="신고하기"
             :disabled="!selectedReportType"
             @click="submit"
