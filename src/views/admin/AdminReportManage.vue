@@ -58,6 +58,11 @@ const handleDelete = async (reportId, propertyId) => {
   await adminReportStore.setStatus(reportId, "DELETED", propertyId);
 };
 
+// 매물상세 이동
+const handleProperty = (propertyId) => {
+  router.push(`/properties/${propertyId}`);
+};
+
 onMounted(() => {
   adminReportStore.getReport(1);
 });
@@ -70,21 +75,19 @@ onMounted(() => {
       <!-- 로고 영역 -->
       <div class="logo-area">
         <h1>Zip-da</h1>
-        <p>Broker Admin</p>
+        <p>Admin</p>
       </div>
 
       <!-- 네비게이션 메뉴 -->
       <nav class="nav-menu">
-        <RouterLink to="/admin/dashboard" class="nav-item">
-          <span class="nav-icon">▦</span>
-          <span>대시보드</span>
-        </RouterLink>
-
         <RouterLink to="/admin/reports" class="nav-item active">
           <span class="nav-icon">▣</span>
           <span>신고관리</span>
         </RouterLink>
-
+        <RouterLink to="/admin/dashboard" class="nav-item">
+          <span class="nav-icon">▦</span>
+          <span>매물관리</span>
+        </RouterLink>
         <RouterLink to="/admin/users" class="nav-item">
           <span class="nav-icon">👥</span>
           <span>회원관리</span>
@@ -94,10 +97,10 @@ onMounted(() => {
       <!-- 관리자 정보 -->
       <div class="admin-profile">
         <div class="profile-icon">👤</div>
-        <div>
+        <!-- <div>
           <strong>관리자01</strong>
           <p>admin@zip-da.com</p>
-        </div>
+        </div> -->
       </div>
     </aside>
 
@@ -135,7 +138,10 @@ onMounted(() => {
               <tr v-for="item in adminReportStore.items" :key="item.reportId">
                 <!-- 매물 정보 / 주소 -->
                 <td>
-                  <div class="property-info">
+                  <div
+                    class="property-info"
+                    @click="handleProperty(item.propertyId)"
+                  >
                     <!-- <img :src="item.thumbnailUrl" class="property-image" /> -->
                     <div class="property-text">
                       <!-- <strong>{{ item.propertyName }}</strong> -->
@@ -492,6 +498,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 18px;
+  cursor: pointer;
 }
 
 .property-image {
