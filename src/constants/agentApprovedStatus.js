@@ -4,6 +4,12 @@ const agentApprovedStatus = {
   REJECTED: "거부됨",
 };
 
+export const AGENT_APPROVED_STATUS = {
+  APPROVED: "APPROVED",
+  PENDING: "PENDING",
+  REJECTED: "REJECTED",
+};
+
 Object.freeze(agentApprovedStatus);
 
 const getAgentApprovedStatusName = (code) => {

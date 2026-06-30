@@ -14,11 +14,24 @@ export const useAgentStore = defineStore("agentStore", () => {
   // 2. Getters
 
   // 3. Actions
+  const resetAgentStore = () => {
+    approvedStatus.value = "";
+    licenseNo.value = "";
+    businessNo.value = "";
+    officeName.value = "";
+    agentImageUrl.value = "";
+  };
+
   const applyAgent = async (applyForm) => {
     try {
       const url = "/api/agents";
       const res = await myAxios.post(url, applyForm);
-      approvedStatus.value = agentApprovedStatus.agentApprovedStatus.PENDING;
+      licenseNo.value = applyForm.licenseNo;
+      businessNo.value = applyForm.businessNo;
+      officeName.value = applyForm.officeName;
+      agentImageUrl.value = applyForm.agentImageUrl;
+
+      approvedStatus.value = res.data.data.approvedStatus;
       return res.data;
     } catch (error) {
       throw error;
@@ -33,10 +46,11 @@ export const useAgentStore = defineStore("agentStore", () => {
       licenseNo.value = res.data.data.licenseNo;
       businessNo.value = res.data.data.businessNo;
       officeName.value = res.data.data.officeName;
-      approvedStatus.value = res.data.data.agentApprovedStatus;
+      approvedStatus.value = res.data.data.approvedStatus;
       agentImageUrl.value = res.data.data.agentImageUrl;
     } catch (error) {
       if (error.response?.status === 404) {
+        resetAgentStore();
         return;
       }
       throw error;
@@ -54,5 +68,6 @@ export const useAgentStore = defineStore("agentStore", () => {
     // Actions
     applyAgent,
     checkAgentInfo,
+    resetAgentStore,
   };
 });

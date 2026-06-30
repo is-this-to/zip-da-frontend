@@ -50,5 +50,6 @@ const props = defineProps({
 button {
   font-weight: 400;
   cursor: pointer;
+  border: none;
 }
 </style>

@@ -78,12 +78,12 @@ const handleChangeProfile = async (e) => {
     // API 서버에 파일 저장 요청
     try {
       const fileUri = await fileStore.storeAgentProfile(file);
+      if (fileUri) {
+        applyForm.agentImageUrl = fileUri;
+        preview.value = URL.createObjectURL(file);
+      }
     } catch (error) {
       if (myErrorStore.redirectErrorPage(error)) return;
-    }
-    if (fileUri) {
-      applyForm.agentImageUrl = fileUri;
-      preview.value = URL.createObjectURL(file);
     }
   }
 };
