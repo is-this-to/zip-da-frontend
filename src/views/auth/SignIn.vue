@@ -5,9 +5,13 @@ import { useAuthStore } from "../../store/auth/useAuthStore.js";
 import signInValidator from "../../util/validator/domain/auth/signInValidator.js";
 import MyButton from "../../components/button/MyButton.vue";
 import MyInput from "../../components/input/MyInput.vue";
+import { useAgentStore } from "../../store/agent/useAgentStore.js";
+import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const agentStore = useAgentStore();
+const myErrorStore = useMyErrorStore();
 
 const notYet = () => alert("2차 구현 예정입니다.");
 
@@ -32,8 +36,10 @@ const submitLogin = async () => {
       isSubmitting.value = true;
       errorMessage.value = "";
       await authStore.login(signInForm);
-      router.push("/main");
+
+      router.replace("/main");
     } catch (error) {
+      if (myErrorStore.redirectErrorPage(error)) return;
       errorMessage.value = "이메일 또는 비밀번호를 확인해 주세요.";
     } finally {
       isSubmitting.value = false;
@@ -117,14 +123,14 @@ const submitLogin = async () => {
           <span></span>
         </div>
 
-        <div class="social-grid">
+        <!-- <div class="social-grid">
           <button type="button" class="kakao-button" @click="notYet">
             Kakao
           </button>
           <button type="button" class="naver-button" @click="notYet">
             Naver
           </button>
-        </div>
+        </div> -->
 
         <p class="signup-copy">
           아직 계정이 없나요?

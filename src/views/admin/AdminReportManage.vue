@@ -5,13 +5,14 @@ import { useRouter } from "vue-router";
 import propertyTypeCodes from "../../constants/propertyType.js";
 import reportTypeCodes from "../../constants/reportType.js";
 import reportStatusCodes from "../../constants/reportStatusCode.js";
+import { useAuthStore } from "../../store/auth/useAuthStore.js";
 
 const router = useRouter();
 const adminReportStore = useAdminReportStore();
 const { propertyType, getPropertyTypeName } = propertyTypeCodes;
 const { reportType, getReportTypeName } = reportTypeCodes;
 const { reportStatus, getReportStatusName } = reportStatusCodes;
-
+const authStore = useAuthStore();
 // --- 페이지네이션 로직 START---
 const pageBlockSize = 5;
 
@@ -74,7 +75,7 @@ onMounted(() => {
     <aside class="sidebar">
       <!-- 로고 영역 -->
       <div class="logo-area">
-        <h1>Zip-da</h1>
+        <div class="title">ZIPDA</div>
         <p>Admin</p>
       </div>
 
@@ -84,19 +85,20 @@ onMounted(() => {
           <span class="nav-icon">▣</span>
           <span>신고관리</span>
         </RouterLink>
-        <RouterLink to="/admin/dashboard" class="nav-item">
+        <!-- <RouterLink to="/admin/dashboard" class="nav-item" >
           <span class="nav-icon">▦</span>
           <span>매물관리</span>
         </RouterLink>
-        <RouterLink to="/admin/users" class="nav-item">
+        <RouterLink to="/admin/users" class="nav-item" >
           <span class="nav-icon">👥</span>
           <span>회원관리</span>
-        </RouterLink>
+        </RouterLink> -->
       </nav>
 
       <!-- 관리자 정보 -->
       <div class="admin-profile">
         <div class="profile-icon">👤</div>
+        <div class="profile-admin-name">{{ authStore.userInfo.name }}</div>
         <!-- <div>
           <strong>관리자01</strong>
           <p>admin@zip-da.com</p>
@@ -254,9 +256,7 @@ onMounted(() => {
     </main>
   </div>
 </template>
-
 <style scoped>
-/* 전체 레이아웃 */
 .admin-layout {
   display: flex;
   min-height: 100vh;
@@ -264,37 +264,38 @@ onMounted(() => {
   color: #1f2937;
 }
 
-/* 왼쪽 사이드바 */
 .sidebar {
   width: 280px;
+  min-width: 280px;
   min-height: 100vh;
   padding: 36px 20px;
   background-color: #ffffff;
   border-right: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
-/* 로고 영역 */
 .logo-area {
   margin-bottom: 56px;
   padding-left: 12px;
 }
 
-.logo-area h1 {
+.logo-area .title {
   margin: 0;
   font-size: 32px;
   font-weight: 800;
   color: #2563eb;
+  line-height: 1.2;
 }
 
 .logo-area p {
   margin: 4px 0 0;
   font-size: 16px;
   color: #64748b;
+  line-height: 1.4;
 }
 
-/* 네비게이션 */
 .nav-menu {
   display: flex;
   flex-direction: column;
@@ -312,6 +313,7 @@ onMounted(() => {
   font-size: 17px;
   font-weight: 700;
   transition: 0.2s;
+  min-width: 0;
 }
 
 .nav-item:hover {
@@ -327,11 +329,11 @@ onMounted(() => {
 
 .nav-icon {
   width: 24px;
+  flex-shrink: 0;
   text-align: center;
   font-size: 20px;
 }
 
-/* 관리자 프로필 */
 .admin-profile {
   margin-top: auto;
   padding: 18px;
@@ -340,11 +342,13 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .profile-icon {
   width: 46px;
   height: 46px;
+  flex-shrink: 0;
   border-radius: 50%;
   background-color: #ffffff;
   display: flex;
@@ -352,24 +356,23 @@ onMounted(() => {
   justify-content: center;
 }
 
-.admin-profile strong {
+.profile-admin-name {
+  min-width: 0;
   font-size: 15px;
+  font-weight: 700;
   color: #111827;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.4;
 }
 
-.admin-profile p {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: #64748b;
-}
-
-/* 메인 영역 */
 .main-content {
   flex: 1;
+  min-width: 0;
   padding: 48px 56px;
+  box-sizing: border-box;
 }
 
-/* 페이지 제목 */
 .page-header {
   margin-bottom: 32px;
 }
@@ -379,21 +382,24 @@ onMounted(() => {
   font-size: 36px;
   font-weight: 800;
   color: #111827;
+  line-height: 1.2;
 }
 
 .page-header p {
   margin: 10px 0 0;
   font-size: 17px;
   color: #64748b;
+  line-height: 1.6;
+  word-break: keep-all;
 }
 
-/* 신고 리스트 카드 */
 .report-card {
   background-color: #ffffff;
   border-radius: 22px;
   padding: 30px;
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
   border: 1px solid #e5e7eb;
+  overflow: hidden;
 }
 
 .card-header {
@@ -405,18 +411,22 @@ onMounted(() => {
   font-size: 24px;
   font-weight: 800;
   color: #111827;
+  line-height: 1.3;
 }
 
-/* 테이블 감싸는 영역 */
 .table-wrap {
+  width: 100%;
   border: 1px solid #dbe3ef;
   border-radius: 14px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  background-color: #fff;
 }
 
-/* 신고 테이블 */
 .report-table {
   width: 100%;
+  min-width: 1120px;
   border-collapse: collapse;
   table-layout: fixed;
 }
@@ -426,40 +436,44 @@ onMounted(() => {
 }
 
 .report-table th {
-  padding: 18px 20px;
+  padding: 18px 16px;
   text-align: left;
   font-size: 15px;
   font-weight: 800;
   color: #475569;
   border-bottom: 1px solid #dbe3ef;
+  white-space: nowrap;
 }
 
 .report-table td {
-  padding: 20px;
-  font-size: 16px;
+  padding: 18px 16px;
+  font-size: 15px;
   color: #1f2937;
   border-bottom: 1px solid #e5e7eb;
   vertical-align: middle;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
 }
 
 .report-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-/* 컬럼 너비 */
 .report-table th:nth-child(1),
 .report-table td:nth-child(1) {
-  width: 20%;
+  width: 24%;
 }
 
 .report-table th:nth-child(2),
 .report-table td:nth-child(2) {
   width: 10%;
+  text-align: center;
 }
 
 .report-table th:nth-child(3),
 .report-table td:nth-child(3) {
-  width: 25%;
+  width: 18%;
   text-align: center;
 }
 
@@ -471,34 +485,34 @@ onMounted(() => {
 
 .report-table th:nth-child(5),
 .report-table td:nth-child(5) {
-  width: 8%;
+  width: 11%;
   text-align: center;
 }
 
 .report-table th:nth-child(6),
 .report-table td:nth-child(6) {
-  width: 6%;
+  width: 7%;
   text-align: center;
 }
 
 .report-table th:nth-child(7),
 .report-table td:nth-child(7) {
-  width: 8%;
+  width: 10%;
   text-align: center;
 }
 
 .report-table th:nth-child(8),
 .report-table td:nth-child(8) {
-  width: 13%;
+  width: 10%;
   text-align: center;
 }
 
-/* 매물 정보 */
 .property-info {
   display: flex;
-  align-items: center;
-  gap: 18px;
+  align-items: flex-start;
+  gap: 14px;
   cursor: pointer;
+  min-width: 0;
 }
 
 .property-image {
@@ -507,52 +521,66 @@ onMounted(() => {
   border-radius: 12px;
   object-fit: cover;
   background-color: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.property-text {
+  min-width: 0;
 }
 
 .property-text strong {
   display: block;
   margin-bottom: 8px;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 800;
   color: #111827;
+  line-height: 1.4;
 }
 
 .property-text p {
   margin: 0 0 6px;
   font-size: 14px;
   color: #475569;
+  line-height: 1.5;
+  word-break: break-word;
 }
 
 .property-text span {
+  display: block;
   font-size: 13px;
   color: #64748b;
+  line-height: 1.5;
+  word-break: break-word;
 }
 
 .count-text {
   font-weight: 800;
   color: #2563eb;
+  white-space: nowrap;
 }
 
-/* 신고 상태 뱃지 */
 .status-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   min-width: 92px;
+  max-width: 100%;
   padding: 8px 12px;
   border-radius: 999px;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .status-dot {
   width: 9px;
   height: 9px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
-/* 접수 상태 */
 .status-received {
   background-color: #dcfce7;
   color: #15803d;
@@ -562,7 +590,6 @@ onMounted(() => {
   background-color: #22c55e;
 }
 
-/* 검토중 상태 */
 .status-reviewing {
   background-color: #ffedd5;
   color: #c2410c;
@@ -572,7 +599,6 @@ onMounted(() => {
   background-color: #f97316;
 }
 
-/* 처리완료 상태 */
 .status-completed {
   background-color: #dbeafe;
   color: #1d4ed8;
@@ -582,21 +608,22 @@ onMounted(() => {
   background-color: #2563eb;
 }
 
-/* 조치 버튼 */
 .action-buttons {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .action-buttons button {
   border: none;
   border-radius: 10px;
-  padding: 10px 16px;
-  font-size: 14px;
+  padding: 10px 14px;
+  font-size: 13px;
   font-weight: 800;
   cursor: pointer;
   transition: 0.2s;
+  white-space: nowrap;
 }
 
 .reject-button {
@@ -618,21 +645,24 @@ onMounted(() => {
   background-color: #fecaca;
 }
 
-/* 페이지네이션 버튼 */
 .pagination {
   margin-top: 26px;
   display: flex;
   justify-content: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .pagination button {
+  min-width: 40px;
   padding: 8px 12px;
   border: 1px solid var(--personal-color-periwinkle);
   background-color: var(--personal-color-white);
   color: var(--personal-color-gray);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .pagination button:disabled {
@@ -640,55 +670,149 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
-/* 페이지네이션
-.pagination {
-  margin-top: 26px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.page-button {
-  width: 44px;
-  height: 44px;
-  border: 1px solid #dbe3ef;
-  border-radius: 12px;
-  background-color: #ffffff;
-  color: #334155;
-  font-size: 16px;
+.pagination button.active {
+  background-color: var(--personal-color-blue);
+  color: var(--personal-color-white);
+  border-color: var(--personal-color-blue);
   font-weight: 800;
-  cursor: pointer;
-  transition: 0.2s;
 }
 
-.page-button:hover {
-  background-color: #eef4ff;
-  color: #2563eb;
-}
-
-.page-button.active {
-  background-color: #2563eb;
-  color: #ffffff;
-  border-color: #2563eb;
-  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
-} */
-
-/* 작은 화면 대응 */
-@media (max-width: 1100px) {
+@media (max-width: 1280px) {
   .sidebar {
-    width: 230px;
+    width: 240px;
+    min-width: 240px;
+    padding: 28px 16px;
   }
 
   .main-content {
     padding: 36px 28px;
   }
 
-  .report-table {
-    min-width: 1000px;
+  .page-header h2 {
+    font-size: 30px;
   }
 
-  .table-wrap {
-    overflow-x: auto;
+  .report-card {
+    padding: 22px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .admin-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: 100%;
+    min-height: auto;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 20px 16px;
+  }
+
+  .logo-area {
+    margin-bottom: 24px;
+    padding-left: 0;
+  }
+
+  .nav-menu {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .nav-item {
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+
+  .admin-profile {
+    margin-top: 20px;
+  }
+
+  .main-content {
+    width: 100%;
+    padding: 24px 16px 40px;
+  }
+
+  .page-header h2 {
+    font-size: 26px;
+  }
+
+  .page-header p {
+    font-size: 15px;
+  }
+
+  .card-header h3 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .report-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .report-table {
+    min-width: 980px;
+  }
+
+  .report-table th,
+  .report-table td {
+    padding: 14px 12px;
+    font-size: 14px;
+  }
+
+  .property-info {
+    gap: 10px;
+  }
+
+  .property-image {
+    width: 72px;
+    height: 56px;
+  }
+
+  .status-badge {
+    min-width: 80px;
+    font-size: 13px;
+    padding: 7px 10px;
+  }
+
+  .action-buttons button {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-content {
+    padding: 20px 12px 32px;
+  }
+
+  .page-header {
+    margin-bottom: 20px;
+  }
+
+  .page-header h2 {
+    font-size: 22px;
+  }
+
+  .page-header p {
+    font-size: 14px;
+  }
+
+  .report-card {
+    padding: 14px;
+  }
+
+  .pagination {
+    gap: 6px;
+  }
+
+  .pagination button {
+    padding: 7px 10px;
+    font-size: 13px;
   }
 }
 </style>

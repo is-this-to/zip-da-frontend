@@ -5,9 +5,11 @@ import MyButton from "../../components/button/MyButton.vue";
 import PropertyForm from "./components/PropertyForm.vue";
 import { usePropertyCreateStore } from "../../store/property/usePropertyCreateStore";
 import validatePropertyForm from "../../util/validator/domain/property/propertyValidator";
+import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
 
 const router = useRouter();
 const store = usePropertyCreateStore();
+const myErrorStore = useMyErrorStore();
 
 const form = ref({
   description: "",
@@ -44,7 +46,9 @@ const handleSubmit = async () => {
     alert("매물이 등록되었습니다.");
     router.push(`/properties/${result.propertyId}`);
   } catch (error) {
-    const message = error.response?.data?.message || "매물 등록에 실패했습니다.";
+    if (myErrorStore.redirectErrorPage(error)) return;
+    const message =
+      error.response?.data?.message || "매물 등록에 실패했습니다.";
     alert(message);
   }
 };

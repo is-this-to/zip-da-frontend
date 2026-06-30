@@ -7,8 +7,10 @@ import {
 } from "../../../constants/propertyEnums";
 import { REGIONS, OPTIONS } from "../../../constants/regions";
 import { uploadImage, deleteImage } from "../../../api/propertyApi";
+import { useMyErrorStore } from "../../../store/error/useMyErrorStore.js";
 
 const form = defineModel({ type: Object, required: true });
+const myErrorStore = useMyErrorStore();
 
 defineProps({
   errors: { type: Object, default: () => ({}) },
@@ -98,7 +100,8 @@ const uploadOne = async (file) => {
   try {
     const fileUri = await uploadImage(file);
     form.value.imageUrls = [...form.value.imageUrls, fileUri];
-  } catch {
+  } catch (error) {
+    if (myErrorStore.redirectErrorPage(error)) return;
     alert(`${file.name} 업로드에 실패했습니다.`);
   } finally {
     uploadingFiles.value = uploadingFiles.value.filter(
@@ -113,7 +116,8 @@ const removeImage = async (fileUri) => {
     form.value.imageUrls = form.value.imageUrls.filter(
       (url) => url !== fileUri,
     );
-  } catch {
+  } catch (error) {
+    if (myErrorStore.redirectErrorPage(error)) return;
     alert("이미지 삭제에 실패했습니다.");
   }
 };

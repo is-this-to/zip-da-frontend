@@ -4,11 +4,13 @@ import myAxios from "../../api/myAxios";
 import { useRoute } from "vue-router";
 import transactionTypeCodes from "../../constants/transactionTypeCode.js";
 import { usePropertyShowStore } from "../../store/property/usePropertyShowStore";
+import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
 import ReportModal from "./ReportModal.vue";
 
 const route = useRoute(); // useRoute 현재 정보
 const propertyShowStore = usePropertyShowStore();
 const { transactionType, getTransactionTypeName } = transactionTypeCodes;
+const myErrorStore = useMyErrorStore();
 
 // -- 신고하기 --
 const isReportModalOpen = ref(false);
@@ -25,6 +27,7 @@ onBeforeMount(async () => {
 
     await propertyShowStore.getProperty(propertyId);
   } catch (error) {
+    if (myErrorStore.redirectErrorPage(error)) return;
     // myErrorStore.setErrorInfo(error);  TODO:구현하기
     // router.replace("/error");    TODO:구현하기
   }

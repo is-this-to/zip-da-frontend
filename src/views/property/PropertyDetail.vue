@@ -17,6 +17,7 @@ import {
 } from "../../constants/propertyEnums";
 import { useAuthStore } from "../../store/auth/useAuthStore";
 import { formatKoreanCurrency } from "../../util/formatter/useCurrency.js";
+import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
 import ReportModal from "./ReportModal.vue";
 import transactionTypeCodes from "../../constants/transactionTypeCode.js";
 import propertyStatusCodes from "../../constants/propertyStatus.js";
@@ -26,6 +27,7 @@ import propertyTypeCodes from "../../constants/propertyType.js";
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const myErrorStore = useMyErrorStore();
 
 const property = ref(null);
 const isLoading = ref(true);
@@ -103,7 +105,7 @@ const fetchProperty = async () => {
 
     isFavorite.value = property.value.isFavorite; // 서버에서 가져온 찜 초기값
   } catch (error) {
-    console.error("매물 상세 조회 실패:", error);
+    if (myErrorStore.redirectErrorPage(error)) return;
     errorMessage.value =
       error.response?.data?.message || "매물 정보를 불러올 수 없습니다.";
   } finally {
@@ -135,7 +137,7 @@ const handleStatusChange = async (newStatus) => {
     alert("거래 상태가 변경되었습니다.");
     await fetchProperty();
   } catch (error) {
-    console.error("거래상태 변경 실패:", error);
+    if (myErrorStore.redirectErrorPage(error)) return;
     alert(error.response?.data?.message || "변경에 실패했습니다.");
   }
 };
