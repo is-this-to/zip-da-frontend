@@ -9,14 +9,12 @@ const withdrawModalOpen = ref(false);
   <div class="page-head">
     <span>ACCOUNT</span>
     <h1>계정 관리</h1>
-    <p>지금은 버튼 모양만 만든 상태입니다. 실제 기능은 나중에 연결합니다.</p>
   </div>
 
   <section class="account-card">
     <div class="icon blue">↪</div>
     <div>
       <h2>로그아웃</h2>
-      <p>로그아웃은 담당자 기능이라서 여기서는 호출하지 않습니다.</p>
     </div>
     <button class="outline" disabled>로그아웃</button>
   </section>
@@ -25,7 +23,6 @@ const withdrawModalOpen = ref(false);
     <div class="icon blue">🔒</div>
     <div>
       <h2>비밀번호 변경</h2>
-      <p>비밀번호 변경 화면만 확인할 수 있습니다.</p>
     </div>
     <button class="outline" @click="passwordModalOpen = true">변경</button>
   </section>
@@ -34,14 +31,19 @@ const withdrawModalOpen = ref(false);
     <div class="icon red">!</div>
     <div>
       <h2>회원탈퇴</h2>
-      <p>회원탈퇴 화면만 확인할 수 있습니다. 실제 API는 아직 호출하지 않습니다.</p>
     </div>
     <button class="danger" @click="withdrawModalOpen = true">회원탈퇴</button>
   </section>
 
-  <div v-if="passwordModalOpen" class="modal-backdrop" @click.self="passwordModalOpen = false">
+  <div
+    v-if="passwordModalOpen"
+    class="modal-backdrop"
+    @click.self="passwordModalOpen = false"
+  >
     <section class="modal">
-      <button class="close" type="button" @click="passwordModalOpen = false">×</button>
+      <button class="close" type="button" @click="passwordModalOpen = false">
+        ×
+      </button>
       <h2>비밀번호 변경</h2>
       <p>API 연결 전 화면입니다.</p>
       <input type="password" placeholder="현재 비밀번호" disabled />
@@ -51,9 +53,15 @@ const withdrawModalOpen = ref(false);
     </section>
   </div>
 
-  <div v-if="withdrawModalOpen" class="modal-backdrop" @click.self="withdrawModalOpen = false">
+  <div
+    v-if="withdrawModalOpen"
+    class="modal-backdrop"
+    @click.self="withdrawModalOpen = false"
+  >
     <section class="modal">
-      <button class="close" type="button" @click="withdrawModalOpen = false">×</button>
+      <button class="close" type="button" @click="withdrawModalOpen = false">
+        ×
+      </button>
       <h2>회원탈퇴</h2>
       <p>API 연결 전 화면입니다.</p>
       <input placeholder="탈퇴합니다" disabled />
