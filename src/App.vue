@@ -30,5 +30,5 @@ watch(
 <template>
   <Header v-if="!isAdminPage && !isErrorPage" />
   <router-view></router-view>
-  <Footer v-if="!isAdminPage"></Footer>
+  <Footer v-if="!isAdminPage && !isErrorPage"></Footer>
 </template>

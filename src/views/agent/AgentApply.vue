@@ -50,6 +50,9 @@ const submitApply = async () => {
 
       await agentStore.applyAgent(newApplyForm);
       await router.replace("/");
+      alert(
+        "인증 신청이 접수되었습니다. 승인 후 중개사 기능을 사용할 수 있습니다.",
+      );
     } catch (error) {
       if (myErrorStore.redirectErrorPage(error)) return;
       errorMessage.value =

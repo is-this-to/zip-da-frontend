@@ -92,6 +92,8 @@ const routes = [
     path: "/errors",
     component: ErrorPage,
     meta: setMeta(false, false),
+  },
+  {
     path: "/admin/reports",
     component: AdminReportManage,
     meta: setMeta(true, false, [USER_ROLE.ADMIN]),
