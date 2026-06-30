@@ -102,11 +102,6 @@ const routes = [
     component: ErrorPage,
     meta: setMeta(false, false),
   },
-  {
-    path: "/admin/reports",
-    component: AdminReportManage,
-    meta: setMeta(true, false, [USER_ROLE.ADMIN]),
-  },
   // ============ 마이페이지 (담당: 장수린 / feature/mypage_JSL) ============
   {
     path: "/mypage",
@@ -154,8 +149,7 @@ router.beforeEach(async (to, from, next) => {
   const agentStore = useAgentStore();
 
   const isAdminRoute =
-    to.path === "/admins/sign-in" ||
-    to.meta.roles.includes(USER_ROLE.ADMIN);
+    to.path === "/admins/sign-in" || to.meta.roles.includes(USER_ROLE.ADMIN);
 
   if (isAdminRoute) {
     if (!adminAuthStore.authInitialized) {

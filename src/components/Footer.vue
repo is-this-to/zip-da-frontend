@@ -12,13 +12,8 @@
       </section>
 
       <nav class="footer-nav" aria-label="푸터 메뉴">
-<<<<<<< HEAD
-        <RouterLink to="/properties">매물 찾기</RouterLink>
-        <RouterLink to="/agents/apply">중개사 인증</RouterLink>
-=======
         <RouterLink to="/properties">매물 조회</RouterLink>
         <RouterLink to="/properties/create">매물 등록</RouterLink>
->>>>>>> dev
       </nav>
     </div>
 
