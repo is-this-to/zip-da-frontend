@@ -4,10 +4,19 @@ import myAxios from "../../api/myAxios";
 import { useRoute } from "vue-router";
 import transactionTypeCodes from "../../constants/transactionTypeCode.js";
 import { usePropertyShowStore } from "../../store/property/usePropertyShowStore";
+import ReportModal from "./ReportModal.vue";
 
 const route = useRoute(); // useRoute 현재 정보
 const propertyShowStore = usePropertyShowStore();
 const { transactionType, getTransactionTypeName } = transactionTypeCodes;
+
+// -- 신고하기 --
+const isReportModalOpen = ref(false);
+
+function openModal() {
+  isReportModalOpen.value = true;
+}
+// -----
 
 onBeforeMount(async () => {
   try {
@@ -20,7 +29,7 @@ onBeforeMount(async () => {
     // router.replace("/error");    TODO:구현하기
   }
 });
-// onBeforeUnmount(propertyShowStore.clearPropertyShow); // 최근 봤던 게시글 상세페이지 잠깐 보이는 현상 방지
+// BeforeUnmount(propertyShowStore.clearPropertyShow); // 최근 봤던 게시글 상세페이지 잠깐 보이는 현상 방지
 </script>
 
 <template>
@@ -144,7 +153,8 @@ onBeforeMount(async () => {
             d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
           ></path>
         </svg>
-        신고하기
+        <!-- 신고하기 모달 -->
+        <span @click="openModal"> 신고하기 </span>
       </button>
     </div>
 
@@ -179,6 +189,12 @@ onBeforeMount(async () => {
       </div>
     </div>
   </div>
+
+  <!-- 신고하기 모달 -->
+  <ReportModal
+    :visible="isReportModalOpen"
+    @close="isReportModalOpen = false"
+  />
 </template>
 
 <style scoped>
@@ -477,7 +493,7 @@ onBeforeMount(async () => {
   padding: 0.625rem 1.25rem;
   background-color: #2563eb;
   color: #ffffff;
-  font-size: 0.875rem;
+
   font-weight: bold;
   border-radius: 0.5rem;
   border: none;

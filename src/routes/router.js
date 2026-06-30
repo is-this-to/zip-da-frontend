@@ -8,6 +8,7 @@ import Admin from "../views/admin/Admin.vue";
 import { USER_ROLE } from "../constants/role.js";
 import PropertySearch from "../views/property/PropertySearch.vue";
 import PropertyShow from "../views/property/PropertyShow.vue";
+import AdminReportManage from "../views/admin/AdminReportManage.vue";
 import PropertyCreate from "../views/property/PropertyCreate.vue";
 import PropertyEdit from "../views/property/PropertyEdit.vue";
 import PropertyDetail from "../views/property/PropertyDetail.vue";
@@ -66,13 +67,18 @@ const routes = [
   },
   {
     path: "/admin",
-    component: Admin,
+    component: AdminReportManage,
     meta: setMeta(true, false, [USER_ROLE.ADMIN]),
   },
   {
     path: "/admin-sign-in",
     component: AdminSignIn,
     meta: setMeta(false, false),
+  },
+  {
+    path: "/admin/reports",
+    component: AdminReportManage,
+    meta: setMeta(true, false, [USER_ROLE.ADMIN]),
   },
 ];
 
