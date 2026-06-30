@@ -12,6 +12,7 @@ import AgentApply from "../views/agent/AgentApply.vue";
 import AgentPage from "../views/agent/AgentPage.vue";
 import { useAgentStore } from "../store/agent/useAgentStore.js";
 import { AGENT_APPROVED_STATUS } from "../constants/agentApprovedStatus.js";
+import AdminReportManage from "../views/admin/AdminReportManage.vue";
 import PropertyCreate from "../views/property/PropertyCreate.vue";
 import PropertyEdit from "../views/property/PropertyEdit.vue";
 import PropertyDetail from "../views/property/PropertyDetail.vue";
@@ -68,8 +69,8 @@ const routes = [
     meta: setMeta(false, true),
   },
   {
-    path: "/admins",
-    component: Admin,
+    path: "/admin",
+    component: AdminReportManage,
     meta: setMeta(true, false, [USER_ROLE.ADMIN]),
   },
   {
@@ -91,6 +92,9 @@ const routes = [
     path: "/errors",
     component: ErrorPage,
     meta: setMeta(false, false),
+    path: "/admin/reports",
+    component: AdminReportManage,
+    meta: setMeta(true, false, [USER_ROLE.ADMIN]),
   },
 ];
 

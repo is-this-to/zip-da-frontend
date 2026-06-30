@@ -17,6 +17,7 @@ import {
 import { useAuthStore } from "../../store/auth/useAuthStore";
 import { formatKoreanCurrency } from "../../util/formatter/useCurrency.js";
 import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
+import ReportModal from "./ReportModal.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -60,6 +61,21 @@ const isAdmin = computed(() => authStore.role === "ADMIN");
 // 수정/삭제 가능?
 const canEdit = computed(() => isOwner.value || isAdmin.value);
 
+// 신고 가능한가?
+const canReport = computed(() => {
+  if (!property.value || !authStore.userInfo) return false;
+  if (property.value.userId === authStore.userInfo.userId) return false;
+  return true;
+});
+
+// 찜 가능한가?
+const canLike = computed(() => {
+  if (!property.value || !authStore.userInfo) return false;
+  if (property.value.userId === authStore.userInfo.userId) return false;
+  return true;
+});
+const isFavorite = ref(false);
+
 // 가격 표시 포맷
 const formatPrice = (value) => {
   if (value === null || value === undefined) return "-";
@@ -89,6 +105,8 @@ const fetchProperty = async () => {
   errorMessage.value = "";
   try {
     property.value = await getPropertyDetail(propertyId.value);
+
+    isFavorite.value = property.value.isFavorite; // 서버에서 가져온 찜 초기값
   } catch (error) {
     if (myErrorStore.redirectErrorPage(error)) return;
     errorMessage.value =
@@ -124,6 +142,25 @@ const handleStatusChange = async (newStatus) => {
   } catch (error) {
     if (myErrorStore.redirectErrorPage(error)) return;
     alert(error.response?.data?.message || "변경에 실패했습니다.");
+  }
+};
+
+// 신고하기
+const isReportModalOpen = ref(false);
+function openModal() {
+  isReportModalOpen.value = true;
+}
+
+// 찜 처리
+const toggleLike = async () => {
+  isFavorite.value = !isFavorite.value;
+
+  try {
+    await updatePropertyFavorite(propertyId.value, isFavorite.value);
+  } catch (error) {
+    console.error("찜하기 처리 실패", error);
+    isFavorite.value = !isFavorite.value;
+    alert("찜하기 처리에 실패했습니다.");
   }
 };
 
@@ -163,20 +200,49 @@ onMounted(() => {
 
       <!-- 상단 정보 -->
       <section class="header-info">
-        <div class="badges">
-          <span class="badge primary">{{ propertyTypeLabel }}</span>
-          <span class="badge">{{ transactionTypeLabel }}</span>
-          <span class="badge status">{{ statusLabel }}</span>
-          <span class="badge source">{{ sourceTypeLabel }}</span>
+        <div class="title-box">
+          <div class="badges">
+            <span class="badge primary">{{ propertyTypeLabel }}</span>
+            <span class="badge">{{ transactionTypeLabel }}</span>
+            <span class="badge status">{{ statusLabel }}</span>
+            <span class="badge source">{{ sourceTypeLabel }}</span>
+          </div>
+          <h1>{{ priceDisplay }}</h1>
+          <p v-if="property.region" class="address">
+            {{ property.region.province }} {{ property.region.city }}
+            {{ property.region.district }}
+            <span v-if="property.detailAddress">
+              · {{ property.detailAddress }}</span
+            >
+          </p>
         </div>
-        <h1>{{ priceDisplay }}</h1>
-        <p v-if="property.region" class="address">
-          {{ property.region.province }} {{ property.region.city }}
-          {{ property.region.district }}
-          <span v-if="property.detailAddress">
-            · {{ property.detailAddress }}</span
-          >
-        </p>
+        <div :visible="isReportModalOpen" class="heart-box">
+          <!-- 찜 -->
+          <button class="btn-heart" @click="toggleLike">
+            <svg
+              v-if="isFavorite"
+              style="color: var(--personal-color-blue)"
+              fill="currentColor"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
+            </svg>
+            <svg v-else fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
+            </svg>
+          </button>
+        </div>
       </section>
 
       <!-- 매물 정보 -->
@@ -233,6 +299,45 @@ onMounted(() => {
         <p class="description">{{ property.description }}</p>
       </section>
 
+      <!-- 신고하기 -->
+      <button v-if="canReport" class="btn-report">
+        <svg width="16" height="20" viewBox="0 0 16 20" fill="none">
+          <path
+            d="M0 17V15H2V8C2 6.61667 2.41667 5.3875 3.25 4.3125C4.08333 3.2375 5.16667 2.53333 6.5 2.2V1.5C6.5 1.08333 6.64583 0.729167 6.9375 0.4375C7.22917 0.145833 7.58333 0 8 0C8.41667 0 8.77083 0.145833 9.0625 0.4375C9.35417 0.729167 9.5 1.08333 9.5 1.5V2.2C10.8333 2.53333 11.9167 3.2375 12.75 4.3125C13.5833 5.3875 14 6.61667 14 8V15H16V17H0ZM8 20C7.45 20 6.97917 19.8042 6.5875 19.4125C6.19583 19.0208 6 18.55 6 18H10C10 18.55 9.80417 19.0208 9.4125 19.4125C9.02083 19.8042 8.55 20 8 20ZM4 15H12V8C12 6.9 11.6083 5.95833 10.825 5.175C10.0417 4.39167 9.1 4 8 4C6.9 4 5.95833 4.39167 5.175 5.175C4.39167 5.95833 4 6.9 4 8V15Z"
+            fill="#424656"
+          />
+        </svg>
+        <span @click="openModal"> 신고하기 </span>
+      </button>
+
+      <!-- 매물 등록자정보 -->
+      <div class="seller-card">
+        <div class="seller-profile">
+          <div
+            v-if="property.agentImageUrl && property.agentImageUrl.length > 0"
+            class="agent-avatar"
+          >
+            <img :src="property.agentImageUrl" alt="공인중개사" />
+          </div>
+          <div class="agent-info">
+            <h4>{{ property.propertyUserNick }}</h4>
+          </div>
+        </div>
+        <div class="chat-box">
+          <button class="btn-chat">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              ></path>
+            </svg>
+          </button>
+          <button class="btn-contact">Contact Agent</button>
+        </div>
+      </div>
+
       <!-- 액션 (작성자 본인 또는 어드민만) -->
       <section v-if="canEdit" class="actions">
         <div class="status-actions">
@@ -268,6 +373,12 @@ onMounted(() => {
       </section>
     </div>
   </main>
+
+  <!-- 신고하기 모달 -->
+  <ReportModal
+    :visible="isReportModalOpen"
+    @close="isReportModalOpen = false"
+  />
 </template>
 
 <style scoped>
@@ -327,6 +438,8 @@ onMounted(() => {
 
 /* 상단 정보 */
 .header-info {
+  display: flex;
+  justify-content: space-between;
   padding: 28px;
   border-radius: 22px;
   background: #ffffff;
@@ -441,6 +554,84 @@ onMounted(() => {
   white-space: pre-line;
 }
 
+/* 찜 */
+.btn-heart {
+  padding: 0.5rem;
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-heart svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #6b7280;
+}
+
+/* 신고하기 */
+.btn-report {
+  display: flex;
+  align-items: center;
+  color: #6b7280;
+  font-size: 0.875rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-report svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-right: 0.25rem;
+}
+
+/* 하단 연락처 바 */
+.seller-card {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f3f4f6;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: auto;
+}
+.seller-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.agent-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  overflow: hidden;
+  background-color: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.agent-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.agent-info h4 {
+  font-weight: bold;
+  color: #111827;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
 /* 액션 */
 .actions {
   display: flex;
@@ -493,6 +684,43 @@ onMounted(() => {
 
 .btn-delete:hover {
   background: #ffe6e5;
+}
+
+/* 채팅 버튼 */
+.chat-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-chat {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  background-color: #eff6ff;
+  color: #2563eb;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-chat svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.btn-contact {
+  padding: 0.625rem 1.25rem;
+  background-color: #2563eb;
+  color: #ffffff;
+
+  font-weight: bold;
+  border-radius: 0.5rem;
+  border: none;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  cursor: pointer;
 }
 
 @media (max-width: 640px) {
