@@ -8,6 +8,7 @@ import Admin from "../views/admin/Admin.vue";
 import { USER_ROLE } from "../constants/role.js";
 import PropertySearch from "../views/property/PropertySearch.vue";
 import PropertyShow from "../views/property/PropertyShow.vue";
+import AdminReportManage from "../views/admin/AdminReportManage.vue";
 import PropertyCreate from "../views/property/PropertyCreate.vue";
 import PropertyEdit from "../views/property/PropertyEdit.vue";
 import PropertyDetail from "../views/property/PropertyDetail.vue";
@@ -74,7 +75,7 @@ const routes = [
   },
   {
     path: "/admin",
-    component: Admin,
+    component: AdminReportManage,
     meta: setMeta(true, false, [USER_ROLE.ADMIN]),
   },
   {
@@ -82,40 +83,11 @@ const routes = [
     component: AdminSignIn,
     meta: setMeta(false, false),
   },
-
-  // ============ 마이페이지 (담당: 장수린 / feature/mypage_JSL) ============
   {
-    path: "/mypage",
-    component: MyPage,
-    meta: setMeta(true, false),
-    children: [
-      {
-        path: "",
-        redirect: "/mypage/profile",
-      },
-      {
-        path: "profile",
-        component: MyProfile,
-        meta: setMeta(true, false),
-      },
-      {
-        path: "bookmarks",
-        component: MyBookmarkList,
-        meta: setMeta(true, false),
-      },
-      {
-        path: "posts",
-        component: MyPostList,
-        meta: setMeta(true, false),
-      },
-      {
-        path: "reports",
-        component: MyReportList,
-        meta: setMeta(true, false),
-      },
-    ],
+    path: "/admin/reports",
+    component: AdminReportManage,
+    meta: setMeta(true, false, [USER_ROLE.ADMIN]),
   },
-  // ============================================================
 ];
 
 const router = createRouter({

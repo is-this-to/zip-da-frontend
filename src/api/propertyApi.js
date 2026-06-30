@@ -51,6 +51,13 @@ export const deleteProperty = async (propertyId) => {
   return res.data.data;
 };
 
+// ============ 찜 처리 ============
+export const updatePropertyFavorite = async (propertyId) => {
+  const url = `/api/bookmarks`;
+  const res = await myAxios.patch(url, { propertyId });
+  return res.data.data;
+};
+
 // ===================== 이미지 (김민수님 FILE01 - 실제 API 호출) =====================
 
 /**
