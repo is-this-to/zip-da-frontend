@@ -17,6 +17,10 @@ import {
 import { useAuthStore } from "../../store/auth/useAuthStore";
 import { formatKoreanCurrency } from "../../util/formatter/useCurrency.js";
 import ReportModal from "./ReportModal.vue";
+import transactionTypeCodes from "../../constants/transactionTypeCode.js";
+import propertyStatusCodes from "../../constants/propertyStatus.js";
+import sourceTypeCodes from "../../constants/sourceType.js";
+import propertyTypeCodes from "../../constants/propertyType.js";
 
 const route = useRoute();
 const router = useRouter();
@@ -26,6 +30,11 @@ const property = ref(null);
 const isLoading = ref(true);
 const errorMessage = ref("");
 
+const { transactionType, getTransactionTypeName } = transactionTypeCodes;
+const { propertyStatus, getPropertyStatusName } = propertyStatusCodes;
+const { sourceType, getSourceTypeName } = sourceTypeCodes;
+const { propertyType, getPropertyTypeName } = propertyTypeCodes;
+
 const propertyId = computed(() => Number(route.params.propertyId));
 
 // 백엔드 응답의 enum 객체에서 code 추출 (백엔드가 객체로 보내지만, 안전하게 string 도 대응)
@@ -33,19 +42,6 @@ const extractCode = (value) => {
   if (!value) return null;
   return typeof value === "object" ? value.code : value;
 };
-
-const propertyTypeLabel = computed(() =>
-  getLabel(PROPERTY_TYPES, extractCode(property.value?.propertyType)),
-);
-const transactionTypeLabel = computed(() =>
-  getLabel(TRANSACTION_TYPES, extractCode(property.value?.transactionType)),
-);
-const statusLabel = computed(() =>
-  getLabel(PROPERTY_STATUSES, extractCode(property.value?.status)),
-);
-const sourceTypeLabel = computed(() =>
-  getLabel(SOURCE_TYPES, extractCode(property.value?.sourceType)),
-);
 
 // 현재 사용자가 이 매물의 작성자인가?
 const isOwner = computed(() => {
@@ -178,15 +174,15 @@ onMounted(() => {
     <div v-else-if="property" class="detail">
       <!-- 이미지 갤러리 -->
       <section
-        v-if="property.imageUrls && property.imageUrls.length > 0"
+        v-if="property.images && property.images.length > 0"
         class="gallery"
       >
         <img
-          :src="property.imageUrls[0]"
+          :src="property.images[0].imageUrl"
           :alt="'대표 이미지'"
           class="main-image"
         />
-        <div v-if="property.imageUrls.length > 1" class="thumbnails">
+        <div v-if="property.images.length > 1" class="thumbnails">
           <img
             v-for="(url, index) in property.imageUrls.slice(1)"
             :key="url"
@@ -200,10 +196,18 @@ onMounted(() => {
       <section class="header-info">
         <div class="title-box">
           <div class="badges">
-            <span class="badge primary">{{ propertyTypeLabel }}</span>
-            <span class="badge">{{ transactionTypeLabel }}</span>
-            <span class="badge status">{{ statusLabel }}</span>
-            <span class="badge source">{{ sourceTypeLabel }}</span>
+            <span class="badge primary">{{
+              getPropertyTypeName(property.propertyType)
+            }}</span>
+            <span class="badge">{{
+              getTransactionTypeName(property.transactionType)
+            }}</span>
+            <span class="badge status">{{
+              getPropertyStatusName(property.status)
+            }}</span>
+            <span class="badge source">{{
+              getSourceTypeName(property.sourceType)
+            }}</span>
           </div>
           <h1>{{ priceDisplay }}</h1>
           <p v-if="property.region" class="address">
@@ -332,7 +336,7 @@ onMounted(() => {
               ></path>
             </svg>
           </button>
-          <button class="btn-contact">Contact Agent</button>
+          <button class="btn-contact">전화문의</button>
         </div>
       </div>
 
