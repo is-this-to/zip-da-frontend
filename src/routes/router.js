@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "../store/auth/useAuthStore.js";
+import { useAdminAuthStore } from "../store/auth/useAdminAuthStore.js";
 import Main from "../views/main/Main.vue";
 import SignIn from "../views/auth/SignIn.vue";
 import SignUp from "../views/auth/SignUp.vue";
@@ -149,7 +150,28 @@ const router = createRouter({
 // to: 이동하는 router, from: 지금 있는 router
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
+  const adminAuthStore = useAdminAuthStore();
   const agentStore = useAgentStore();
+
+  const isAdminRoute =
+    to.path === "/admins/sign-in" ||
+    to.meta.roles.includes(USER_ROLE.ADMIN);
+
+  if (isAdminRoute) {
+    if (!adminAuthStore.authInitialized) {
+      await adminAuthStore.reissue();
+    }
+
+    if (to.path === "/admins/sign-in") {
+      return adminAuthStore.isLoggedIn ? next("/admins") : next();
+    }
+
+    if (adminAuthStore.role !== USER_ROLE.ADMIN) {
+      return next("/admins/sign-in");
+    }
+
+    return next();
+  }
 
   if (!authStore.authInitialized) {
     try {
@@ -164,18 +186,6 @@ router.beforeEach(async (to, from, next) => {
     return next("/");
   }
 
-  // admin 권한이 필요한 페이지로 가는데 role이 admin이 아닌경우
-  if (to.meta.roles.includes(USER_ROLE.ADMIN)) {
-    if (!authStore.adminAuthInitialized) {
-      await authStore.adminReissue();
-    }
-
-    if (authStore.role !== USER_ROLE.ADMIN) {
-      return next("/admins/sign-in");
-    }
-  }
-
-  // 로그인이 필요한 페이지인데 로그인 안 한 경우
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     return next("/sign-in");
   }

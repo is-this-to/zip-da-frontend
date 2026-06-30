@@ -1,9 +1,10 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import dayjs from "dayjs";
-import { useAuthStore } from "../store/auth/useAuthStore";
+import { useAdminAuthStore } from "../store/auth/useAdminAuthStore";
 
-const myAxios = axios.create({
+const adminAxios = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -20,9 +21,9 @@ const shouldReissue = (accessToken) => {
   }
 };
 
-myAxios.interceptors.request.use(async (config) => {
-  const authStore = useAuthStore();
-  const isReissueRequest = config.url === "/api/auth/tokens";
+adminAxios.interceptors.request.use(async (config) => {
+  const authStore = useAdminAuthStore();
+  const isReissueRequest = config.url === "/api/admin/auth/tokens";
 
   if (
     !isReissueRequest &&
@@ -39,4 +40,4 @@ myAxios.interceptors.request.use(async (config) => {
   return config;
 });
 
-export default myAxios;
+export default adminAxios;

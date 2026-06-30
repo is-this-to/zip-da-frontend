@@ -39,6 +39,9 @@ const mostLikeProperties = ref([
 const redirectProperties = () => {
   router.push("/properties");
 };
+const redirectCreateProperties = () => {
+  router.push("/properties/create");
+};
 
 const benefitCards = ref([
   {
@@ -235,6 +238,7 @@ onBeforeUnmount(() => {
           :color="'blue'"
           :size="'small-middle'"
           :class="'blue-pill'"
+          @click="redirectCreateProperties"
         ></MyButton>
       </div>
 

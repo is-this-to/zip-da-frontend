@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import myAxios from "../../api/myAxios";
+import adminAxios from "../../api/adminAxios";
 
 export const useAdminReportStore = defineStore("adminReportStore", () => {
   // 1. State
@@ -25,7 +25,7 @@ export const useAdminReportStore = defineStore("adminReportStore", () => {
       // --
       const url = `/api/admin/reports`;
 
-      const response = await myAxios.get(url, { params });
+      const response = await adminAxios.get(url, { params });
       const data = response.data.data;
 
       items.value = data.dataList;
@@ -49,7 +49,7 @@ export const useAdminReportStore = defineStore("adminReportStore", () => {
       };
       const url = `/api/admin/reports/${reportId}`;
 
-      const response = await myAxios.patch(url, payload);
+      const response = await adminAxios.patch(url, payload);
       const resultCode = response.data.code;
       const resultData = response.data.data;
 

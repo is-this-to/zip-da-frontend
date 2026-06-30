@@ -1,29 +1,12 @@
 <script setup>
-<<<<<<< HEAD
-import { computed } from "vue";
-import { useRoute } from "vue-router";
-import Header from "./components/Header.vue";
-=======
 import { computed, watch } from "vue";
 import Header from "./components/Header.vue";
 import { useRoute, useRouter } from "vue-router";
->>>>>>> dev
 import Footer from "./components/Footer.vue";
 import { useAuthStore } from "./store/auth/useAuthStore.js";
 import { useMyErrorStore } from "./store/error/useMyErrorStore.js";
 
 const route = useRoute();
-<<<<<<< HEAD
-const authStore = useAuthStore();
-
-const isAdminPage = computed(() => route.path.startsWith("/admin"));
-</script>
-
-<template>
-  <Header v-if="authStore.authInitialized && !isAdminPage" />
-  <router-view></router-view>
-  <Footer v-if="authStore.authInitialized && !isAdminPage" />
-=======
 const router = useRouter();
 
 const isAdminPage = computed(() => route.path.startsWith("/admins"));
@@ -48,5 +31,4 @@ watch(
   <Header v-if="!isAdminPage && !isErrorPage" />
   <router-view></router-view>
   <Footer v-if="!isAdminPage && !isErrorPage"></Footer>
->>>>>>> dev
 </template>
