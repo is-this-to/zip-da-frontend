@@ -5,7 +5,7 @@ import { useRouter } from "vue-router";
 import propertyTypeCodes from "../../constants/propertyType.js";
 import reportTypeCodes from "../../constants/reportType.js";
 import reportStatusCodes from "../../constants/reportStatusCode.js";
-import { useAuthStore } from "../../store/auth/useAuthStore.js";
+import { useAdminAuthStore } from "../../store/auth/useAdminAuthStore.js";
 import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
 
 const router = useRouter();
@@ -13,7 +13,7 @@ const adminReportStore = useAdminReportStore();
 const { propertyType, getPropertyTypeName } = propertyTypeCodes;
 const { reportType, getReportTypeName } = reportTypeCodes;
 const { reportStatus, getReportStatusName } = reportStatusCodes;
-const authStore = useAuthStore();
+const authStore = useAdminAuthStore();
 const myErrorStore = useMyErrorStore();
 // --- 페이지네이션 로직 START---
 const pageBlockSize = 5;
@@ -52,7 +52,7 @@ const changePage = (page) => {
 
 const handleLogout = async () => {
   try {
-    await authStore.adminLogout();
+    await authStore.logout();
     router.replace("/admins/sign-in");
   } catch (error) {
     if (myErrorStore.redirectErrorPage(error)) return;
@@ -110,7 +110,7 @@ onMounted(() => {
       <!-- 관리자 정보 -->
       <div class="admin-profile">
         <div class="profile-icon">👤</div>
-        <div class="profile-admin-name">{{ authStore.userInfo.name }}</div>
+        <div class="profile-admin-name">{{ authStore.adminInfo?.name }}</div>
         <!-- <div>
           <strong>관리자01</strong>
           <p>admin@zip-da.com</p>

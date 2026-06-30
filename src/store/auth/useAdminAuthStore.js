@@ -1,12 +1,12 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { jwtDecode } from "jwt-decode";
-import myAxios from "../../api/myAxios";
+import adminAxios from "../../api/adminAxios";
 
-export const useAuthStore = defineStore("authStore", () => {
+export const useAdminAuthStore = defineStore("adminAuthStore", () => {
   const isLoggedIn = ref(false);
   const accessToken = ref("");
-  const userInfo = ref(null);
+  const adminInfo = ref(null);
   const authInitialized = ref(false);
 
   let reissuePromise = null;
@@ -24,23 +24,23 @@ export const useAuthStore = defineStore("authStore", () => {
   const clearAuthStore = () => {
     isLoggedIn.value = false;
     accessToken.value = "";
-    userInfo.value = null;
+    adminInfo.value = null;
   };
 
   const setAuthentication = (data) => {
     accessToken.value = data.accessToken;
-    userInfo.value = data.principal;
+    adminInfo.value = data.principal;
     isLoggedIn.value = true;
   };
 
   const login = async (loginForm) => {
-    const res = await myAxios.post("/api/auth/sessions", loginForm);
+    const res = await adminAxios.post("/api/admin/auth/sessions", loginForm);
     setAuthentication(res.data.data);
   };
 
   const performReissue = async () => {
     try {
-      const res = await myAxios.post("/api/auth/tokens");
+      const res = await adminAxios.post("/api/admin/auth/tokens");
       setAuthentication(res.data.data);
       return true;
     } catch {
@@ -51,7 +51,6 @@ export const useAuthStore = defineStore("authStore", () => {
     }
   };
 
-  // 만료 시 여러 API 요청이 동시에 들어와도 refresh token은 한 번만 회전시킨다.
   const reissue = () => {
     if (!reissuePromise) {
       reissuePromise = performReissue().finally(() => {
@@ -64,25 +63,20 @@ export const useAuthStore = defineStore("authStore", () => {
 
   const logout = async () => {
     try {
-      await myAxios.delete("/api/auth/sessions");
+      await adminAxios.delete("/api/admin/auth/sessions");
     } finally {
       clearAuthStore();
     }
   };
 
-  const registration = async (newUserData) => {
-    await myAxios.post("/api/users", newUserData);
-  };
-
   return {
     isLoggedIn,
     accessToken,
-    userInfo,
+    adminInfo,
     authInitialized,
     role,
     login,
     reissue,
     logout,
-    registration,
   };
 });

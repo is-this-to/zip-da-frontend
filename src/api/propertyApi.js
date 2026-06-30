@@ -38,16 +38,20 @@ export const updateProperty = async (propertyId, request) => {
 };
 
 // ============ 거래상태 변경 ============
-export const changePropertyStatus = async (propertyId, status) => {
+export const changePropertyStatus = async (
+  propertyId,
+  status,
+  httpClient = myAxios,
+) => {
   const url = `/api/properties/${propertyId}/status`;
-  const res = await myAxios.patch(url, { status });
+  const res = await httpClient.patch(url, { status });
   return res.data.data;
 };
 
 // ============ 매물 삭제 (soft delete) ============
-export const deleteProperty = async (propertyId) => {
+export const deleteProperty = async (propertyId, httpClient = myAxios) => {
   const url = `/api/properties/${propertyId}`;
-  const res = await myAxios.delete(url);
+  const res = await httpClient.delete(url);
   return res.data.data;
 };
 
