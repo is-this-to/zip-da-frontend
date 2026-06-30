@@ -7,7 +7,6 @@ export const getMyProfile = async () => {
 };
 
 // 내 정보 수정
-// 이메일은 서버에서 수정하지 않기 때문에 보내지 않아도 됩니다.
 export const updateMyProfile = async (profile) => {
   const response = await myAxios.patch("/api/users/me", profile);
   return response.data;

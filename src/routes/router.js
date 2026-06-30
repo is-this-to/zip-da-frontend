@@ -88,6 +88,38 @@ const routes = [
     component: AdminReportManage,
     meta: setMeta(true, false, [USER_ROLE.ADMIN]),
   },
+  // ============ 마이페이지 (담당: 장수린 / feature/mypage_JSL) ============
+  {
+    path: "/mypage",
+    component: MyPage,
+    meta: setMeta(true, false),
+    children: [
+      {
+        path: "",
+        redirect: "/mypage/profile",
+      },
+      {
+        path: "profile",
+        component: MyProfile,
+        meta: setMeta(true, false),
+      },
+      {
+        path: "bookmarks",
+        component: MyBookmarkList,
+        meta: setMeta(true, false),
+      },
+      {
+        path: "posts",
+        component: MyPostList,
+        meta: setMeta(true, false),
+      },
+      {
+        path: "reports",
+        component: MyReportList,
+        meta: setMeta(true, false),
+      },
+    ],
+  },
 ];
 
 const router = createRouter({
