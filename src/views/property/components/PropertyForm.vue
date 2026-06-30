@@ -229,7 +229,11 @@ const removeImage = async (fileUri) => {
         v-model="form.detailAddress"
         :content="'상세 주소'"
         :placeholder="'예: 마린시티 12동 101호'"
+        :required="true"
       />
+      <p v-if="errors.detailAddress" class="error-text">
+        {{ errors.detailAddress }}
+      </p>
     </div>
 
     <!-- 매물 상세 -->
