@@ -3,13 +3,13 @@ import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import MyButton from "../../components/button/MyButton.vue";
 import MyInput from "../../components/input/MyInput.vue";
-import { useAuthStore } from "../../store/auth/useAuthStore.js";
+import { useAdminAuthStore } from "../../store/auth/useAdminAuthStore.js";
 import adminSignInValidator from "../../util/validator/domain/auth/adminSignInValidator.js";
 import { password } from "../../util/validator/rule/userAuthRule.js";
 import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
 
 const router = useRouter();
-const authStore = useAuthStore();
+const authStore = useAdminAuthStore();
 const myErrorStore = useMyErrorStore();
 
 const adminSignInForm = reactive({
@@ -35,7 +35,7 @@ const submitLogin = async () => {
       isSubmitting.value = true;
       errorMessage.value = "";
 
-      await authStore.adminLogin(adminSignInForm);
+      await authStore.login(adminSignInForm);
 
       router.replace("/admins");
     } catch (error) {

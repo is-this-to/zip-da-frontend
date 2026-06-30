@@ -15,6 +15,8 @@ import {
   getLabel,
 } from "../../constants/propertyEnums";
 import { useAuthStore } from "../../store/auth/useAuthStore";
+import { useAdminAuthStore } from "../../store/auth/useAdminAuthStore";
+import adminAxios from "../../api/adminAxios";
 import { formatKoreanCurrency } from "../../util/formatter/useCurrency.js";
 import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
 import ReportModal from "./ReportModal.vue";
@@ -26,6 +28,7 @@ import propertyTypeCodes from "../../constants/propertyType.js";
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const adminAuthStore = useAdminAuthStore();
 const myErrorStore = useMyErrorStore();
 
 const property = ref(null);
@@ -52,7 +55,8 @@ const isOwner = computed(() => {
 });
 
 // 어드민인가?
-const isAdmin = computed(() => authStore.role === "ADMIN");
+const isAdmin = computed(() => adminAuthStore.role === "ADMIN");
+const useAdminPrivileges = computed(() => !isOwner.value && isAdmin.value);
 
 // 수정/삭제 가능?
 const canEdit = computed(() => isOwner.value || isAdmin.value);
@@ -119,7 +123,10 @@ const handleEdit = () => {
 const handleDelete = async () => {
   if (!confirm("정말로 이 매물을 삭제하시겠습니까?")) return;
   try {
-    await deleteProperty(propertyId.value);
+    await deleteProperty(
+      propertyId.value,
+      useAdminPrivileges.value ? adminAxios : undefined,
+    );
     alert("매물이 삭제되었습니다.");
     router.push("/");
   } catch (error) {
@@ -132,7 +139,11 @@ const handleStatusChange = async (newStatus) => {
   const label = getLabel(PROPERTY_STATUSES, newStatus);
   if (!confirm(`거래 상태를 "${label}"로 변경하시겠습니까?`)) return;
   try {
-    await changePropertyStatus(propertyId.value, newStatus);
+    await changePropertyStatus(
+      propertyId.value,
+      newStatus,
+      useAdminPrivileges.value ? adminAxios : undefined,
+    );
     alert("거래 상태가 변경되었습니다.");
     await fetchProperty();
   } catch (error) {

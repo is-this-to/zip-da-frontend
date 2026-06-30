@@ -5,14 +5,16 @@ import { useRouter } from "vue-router";
 import propertyTypeCodes from "../../constants/propertyType.js";
 import reportTypeCodes from "../../constants/reportType.js";
 import reportStatusCodes from "../../constants/reportStatusCode.js";
-import { useAuthStore } from "../../store/auth/useAuthStore.js";
+import { useAdminAuthStore } from "../../store/auth/useAdminAuthStore.js";
+import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
 
 const router = useRouter();
 const adminReportStore = useAdminReportStore();
 const { propertyType, getPropertyTypeName } = propertyTypeCodes;
 const { reportType, getReportTypeName } = reportTypeCodes;
 const { reportStatus, getReportStatusName } = reportStatusCodes;
-const authStore = useAuthStore();
+const authStore = useAdminAuthStore();
+const myErrorStore = useMyErrorStore();
 // --- 페이지네이션 로직 START---
 const pageBlockSize = 5;
 
@@ -47,6 +49,16 @@ const changePage = (page) => {
   if (page === adminReportStore.currentPage) return;
   adminReportStore.getReport(page);
 };
+
+const handleLogout = async () => {
+  try {
+    await authStore.logout();
+    router.replace("/admins/sign-in");
+  } catch (error) {
+    if (myErrorStore.redirectErrorPage(error)) return;
+  }
+};
+
 // --- 페이지네이션 로직 END---
 
 // 반려 버튼 클릭 시 실행
@@ -98,12 +110,15 @@ onMounted(() => {
       <!-- 관리자 정보 -->
       <div class="admin-profile">
         <div class="profile-icon">👤</div>
-        <div class="profile-admin-name">{{ authStore.userInfo.name }}</div>
+        <div class="profile-admin-name">{{ authStore.adminInfo?.name }}</div>
         <!-- <div>
           <strong>관리자01</strong>
           <p>admin@zip-da.com</p>
         </div> -->
       </div>
+      <button type="button" class="logout-button" @click="handleLogout">
+        로그아웃
+      </button>
     </aside>
 
     <!-- 오른쪽 메인 영역 -->
@@ -677,6 +692,34 @@ onMounted(() => {
   font-weight: 800;
 }
 
+.logout-button {
+  margin-top: 12px;
+  width: 100%;
+  height: 48px;
+  border: 1px solid #dbe3ef;
+  border-radius: 14px;
+  background-color: #ffffff;
+  color: #475569;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.logout-button:hover {
+  background-color: #eef4ff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+.logout-button:active {
+  transform: translateY(1px);
+}
+
 @media (max-width: 1280px) {
   .sidebar {
     width: 240px;
@@ -745,6 +788,12 @@ onMounted(() => {
 
   .card-header h3 {
     font-size: 20px;
+  }
+
+  .logout-button {
+    margin-top: 10px;
+    height: 44px;
+    font-size: 14px;
   }
 }
 
