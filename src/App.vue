@@ -28,7 +28,11 @@ watch(
 </script>
 
 <template>
+<<<<<<< Updated upstream
   <Header v-if="!isAdminPage && !isErrorPage" />
+=======
+  <Header v-if="!isAdminPage" />
+>>>>>>> Stashed changes
   <router-view></router-view>
   <Footer v-if="!isAdminPage"></Footer>
 </template>
