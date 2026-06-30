@@ -1,6 +1,7 @@
 ﻿<script setup>
 import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import MyButton from "../../components/button/MyButton.vue";
+import router from "../../routes/router.js";
 
 const intro = reactive({
   eyebrow: "일반 사용자부터 공인중개사까지, 누구나 쉽고 안전하게.",
@@ -34,6 +35,10 @@ const mostLikeProperties = ref([
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=85",
   },
 ]);
+
+const redirectProperties = () => {
+  router.push("/properties");
+};
 
 const benefitCards = ref([
   {
@@ -182,7 +187,7 @@ onBeforeUnmount(() => {
       </article>
     </section>
 
-    <section class="map-section" aria-label="지도 기반 탐색">
+    <!-- <section class="map-section" aria-label="지도 기반 탐색">
       <div class="map-copy reveal" :ref="setRevealRef">
         <span>Map search</span>
         <h2>지도에서 한눈에 원하는 집을 찾아보세요</h2>
@@ -216,7 +221,7 @@ onBeforeUnmount(() => {
           </div>
         </div>
       </div>
-    </section>
+    </section> -->
 
     <section class="owner-section" aria-label="매물 등록 안내">
       <div class="owner-copy reveal" :ref="setRevealRef">
@@ -286,6 +291,7 @@ onBeforeUnmount(() => {
           :color="'blue'"
           :size="'small-middle'"
           :class="'blue-pill'"
+          @click="redirectProperties"
         ></MyButton>
       </div>
     </section>

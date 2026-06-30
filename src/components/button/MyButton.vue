@@ -21,7 +21,6 @@ const props = defineProps({
   width: 768px;
   height: 64px;
   font-size: 20px;
-  
 }
 .middle {
   width: 356px;
@@ -32,7 +31,6 @@ const props = defineProps({
   width: 200px;
   height: 56px;
   font-size: 40px;
-
 }
 .small {
   width: 93px;
@@ -52,5 +50,6 @@ const props = defineProps({
 button {
   font-weight: 400;
   cursor: pointer;
+  border: none;
 }
 </style>

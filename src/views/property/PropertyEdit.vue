@@ -5,10 +5,12 @@ import MyButton from "../../components/button/MyButton.vue";
 import PropertyForm from "./components/PropertyForm.vue";
 import { usePropertyEditStore } from "../../store/property/usePropertyEditStore";
 import validatePropertyForm from "../../util/validator/domain/property/propertyValidator";
+import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
 
 const route = useRoute();
 const router = useRouter();
 const store = usePropertyEditStore();
+const myErrorStore = useMyErrorStore();
 
 const propertyId = ref(Number(route.params.propertyId));
 const form = ref({
@@ -58,6 +60,7 @@ const fetchProperty = async () => {
       imageUrls: detail.imageUrls ?? [],
     };
   } catch (error) {
+    if (myErrorStore.redirectErrorPage(error)) return;
     errorMessage.value =
       error.response?.data?.message || "매물 정보를 불러올 수 없습니다.";
   }
@@ -77,6 +80,7 @@ const handleSubmit = async () => {
     alert("매물 정보가 수정되었습니다.");
     router.push(`/properties/${propertyId.value}`);
   } catch (error) {
+    if (myErrorStore.redirectErrorPage(error)) return;
     const message =
       error.response?.data?.message || "매물 수정에 실패했습니다.";
     alert(message);
@@ -225,4 +229,3 @@ onMounted(fetchProperty);
   }
 }
 </style>
-

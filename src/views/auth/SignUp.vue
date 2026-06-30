@@ -6,11 +6,11 @@ import MyButton from "../../components/button/MyButton.vue";
 import MyInput from "../../components/input/MyInput.vue";
 import { name, passwordCk } from "../../util/validator/rule/userAuthRule.js";
 import signUpValidator from "../../util/validator/domain/auth/signUpValidator.js";
+import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
 
 const router = useRouter();
 const authStore = useAuthStore();
-
-const notYet = () => alert("2차 구현 예정입니다.");
+const myErrorStore = useMyErrorStore();
 
 const signUpForm = reactive({
   email: null,
@@ -55,6 +55,7 @@ const submitSignup = async () => {
       await authStore.registration(signUpForm);
       router.replace("/sign-in");
     } catch (error) {
+      if (myErrorStore.redirectErrorPage(error)) return;
       if (error.response) {
         errorMessage.value =
           error.response.data.data ||
@@ -162,7 +163,7 @@ const submitSignup = async () => {
           :btn-type="'submit'"
         ></MyButton>
 
-        <div class="divider">
+        <!-- <div class="divider">
           <span></span>
           <p>간편 회원가입</p>
           <span></span>
@@ -175,7 +176,7 @@ const submitSignup = async () => {
           <button type="button" class="naver-button" @click="notYet">
             Naver
           </button>
-        </div>
+        </div> -->
 
         <p class="signup-copy">
           계정이 이미 있나요?

@@ -5,13 +5,14 @@ import { useRouter } from "vue-router";
 import propertyTypeCodes from "../../constants/propertyType.js";
 import reportTypeCodes from "../../constants/reportType.js";
 import reportStatusCodes from "../../constants/reportStatusCode.js";
+import { useAuthStore } from "../../store/auth/useAuthStore.js";
 
 const router = useRouter();
 const adminReportStore = useAdminReportStore();
 const { propertyType, getPropertyTypeName } = propertyTypeCodes;
 const { reportType, getReportTypeName } = reportTypeCodes;
 const { reportStatus, getReportStatusName } = reportStatusCodes;
-
+const authStore = useAuthStore();
 // --- 페이지네이션 로직 START---
 const pageBlockSize = 5;
 
@@ -74,7 +75,7 @@ onMounted(() => {
     <aside class="sidebar">
       <!-- 로고 영역 -->
       <div class="logo-area">
-        <h1>Zip-da</h1>
+        <div class="title">ZIPDA</div>
         <p>Admin</p>
       </div>
 
@@ -84,19 +85,20 @@ onMounted(() => {
           <span class="nav-icon">▣</span>
           <span>신고관리</span>
         </RouterLink>
-        <RouterLink to="/admin/dashboard" class="nav-item">
+        <!-- <RouterLink to="/admin/dashboard" class="nav-item" >
           <span class="nav-icon">▦</span>
           <span>매물관리</span>
         </RouterLink>
-        <RouterLink to="/admin/users" class="nav-item">
+        <RouterLink to="/admin/users" class="nav-item" >
           <span class="nav-icon">👥</span>
           <span>회원관리</span>
-        </RouterLink>
+        </RouterLink> -->
       </nav>
 
       <!-- 관리자 정보 -->
       <div class="admin-profile">
         <div class="profile-icon">👤</div>
+        <div class="profile-admin-name">{{ authStore.userInfo.name }}</div>
         <!-- <div>
           <strong>관리자01</strong>
           <p>admin@zip-da.com</p>
@@ -260,6 +262,7 @@ onMounted(() => {
 .admin-layout {
   display: flex;
   min-height: 100vh;
+  min-width: 1300px;
   background-color: #f5f7fb;
   color: #1f2937;
 }
@@ -367,6 +370,7 @@ onMounted(() => {
 .main-content {
   flex: 1;
   padding: 48px 56px;
+  width: 1200px;
 }
 
 /* 페이지 제목 */
@@ -640,41 +644,25 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
-/* 페이지네이션
-.pagination {
-  margin-top: 26px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
+/* 현재 페이지 하이라이트 */
+.pagination button.active {
+    background-color: var(--personal-color-blue);
+    color: var(--personal-color-white);
+    border-color: var(--personal-color-blue);
+    font-weight: bold;
 }
 
-.page-button {
-  width: 44px;
-  height: 44px;
-  border: 1px solid #dbe3ef;
-  border-radius: 12px;
-  background-color: #ffffff;
-  color: #334155;
-  font-size: 16px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: 0.2s;
+@media (max-width: 1500px) {
+  .report-table th {
+    padding: 18px 5px;
+  }
 }
-
-.page-button:hover {
-  background-color: #eef4ff;
-  color: #2563eb;
-}
-
-.page-button.active {
-  background-color: #2563eb;
-  color: #ffffff;
-  border-color: #2563eb;
-  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25);
-} */
 
 /* 작은 화면 대응 */
 @media (max-width: 1100px) {
+  .profile-icon {
+    display: none;
+  }
   .sidebar {
     width: 230px;
   }
@@ -684,6 +672,7 @@ onMounted(() => {
   }
 
   .report-table {
+    /* width: 100%; */
     min-width: 1000px;
   }
 

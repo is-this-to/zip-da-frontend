@@ -19,7 +19,7 @@ export const useRegionStore = defineStore("region", () => {
       const response = await myAxios.get("/api/regions/provinces");
       provinces.value = response.data.data;
     } catch (error) {
-      console.error("시/도 조회 실패", error);
+      throw error;
     }
   };
 
@@ -48,7 +48,7 @@ export const useRegionStore = defineStore("region", () => {
 
       districts.value = [];
     } catch (error) {
-      console.error("시/군/구 조회 실패", error);
+      throw error;
     }
   };
 
@@ -71,7 +71,7 @@ export const useRegionStore = defineStore("region", () => {
       districts.value = response.data.data;
       selectedDistrict.value = null;
     } catch (error) {
-      console.error("읍면동 조회 실패", error);
+      throw error;
     }
   };
 

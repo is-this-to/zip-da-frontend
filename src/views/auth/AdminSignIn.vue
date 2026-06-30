@@ -6,9 +6,11 @@ import MyInput from "../../components/input/MyInput.vue";
 import { useAuthStore } from "../../store/auth/useAuthStore.js";
 import adminSignInValidator from "../../util/validator/domain/auth/adminSignInValidator.js";
 import { password } from "../../util/validator/rule/userAuthRule.js";
+import { useMyErrorStore } from "../../store/error/useMyErrorStore.js";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const myErrorStore = useMyErrorStore();
 
 const adminSignInForm = reactive({
   adminCode: "",
@@ -35,8 +37,9 @@ const submitLogin = async () => {
 
       await authStore.adminLogin(adminSignInForm);
 
-      router.push("/admin");
+      router.replace("/admins");
     } catch (error) {
+      if (myErrorStore.redirectErrorPage(error)) return;
       errorMessage.value = "관리자 이메일 또는 비밀번호를 확인해 주세요.";
     } finally {
       isSubmitting.value = false;

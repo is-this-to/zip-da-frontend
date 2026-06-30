@@ -4,9 +4,11 @@ import MyButton from "./button/MyButton.vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../store/auth/useAuthStore.js";
 import { storeToRefs } from "pinia";
+import { useMyErrorStore } from "../store/error/useMyErrorStore.js";
 
 const router = useRouter();
 const authStore = useAuthStore();
+const errorStore = useMyErrorStore();
 
 const guestNavItems = [
   {
@@ -16,7 +18,7 @@ const guestNavItems = [
   },
   {
     content: "공인중개사 페이지",
-    path: "/",
+    path: "/agents",
   },
 ];
 
@@ -32,7 +34,7 @@ const userNavItems = [
   },
   {
     content: "공인중개사 페이지",
-    path: "/",
+    path: "/agents",
   },
 ];
 
@@ -117,7 +119,6 @@ const { isLoggedIn } = storeToRefs(authStore);
   border: none;
   font-weight: 600;
   color: var(--personal-color-blue);
-  cursor: pointer;
 }
 
 .btn-login:hover,
