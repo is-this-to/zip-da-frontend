@@ -101,10 +101,10 @@ const submitLogin = async () => {
         ></MyInput>
 
         <div class="form-row">
-          <label class="remember-me">
+          <!-- <label class="remember-me">
             <input type="checkbox" />
             <span>로그인 유지</span>
-          </label>
+          </label> -->
           <a href="#" @click="notYet">비밀번호 찾기</a>
         </div>
 
@@ -117,11 +117,11 @@ const submitLogin = async () => {
           :btn-type="'submit'"
         ></MyButton>
 
-        <div class="divider">
+        <!-- <div class="divider">
           <span></span>
           <p>간편 로그인</p>
           <span></span>
-        </div>
+        </div> -->
 
         <!-- <div class="social-grid">
           <button type="button" class="kakao-button" @click="notYet">
