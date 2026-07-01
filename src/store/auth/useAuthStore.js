@@ -83,5 +83,7 @@ export const useAuthStore = defineStore("authStore", () => {
     reissue,
     logout,
     registration,
+    adminLogin,
+    adminReissue,
   };
 });
