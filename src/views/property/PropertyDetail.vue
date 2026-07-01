@@ -78,10 +78,10 @@ const canLike = computed(() => {
 const isFavorite = ref(false);
 
 // 가격 표시 포맷
-const formatPrice = (value) => {
-  if (value === null || value === undefined) return "-";
-  return value.toLocaleString("ko-KR") + "원";
-};
+// const formatPrice = (value) => {
+//   if (value === null || value === undefined) return "-";
+//   return value.toLocaleString("ko-KR") + "원";
+// };
 
 // 금액 표시 (거래 종류에 따라)
 const priceDisplay = computed(() => {
@@ -89,13 +89,13 @@ const priceDisplay = computed(() => {
   const code = extractCode(property.value.transactionType);
   switch (code) {
     case "SALE":
-      return `매매가 ${formatPrice(property.value.price)}`;
+      return `매매가 ${formatKoreanCurrency(property.value.price)}`;
     case "JEONSE":
-      return `전세 ${formatPrice(property.value.deposit)}`;
+      return `전세 ${formatKoreanCurrency(property.value.deposit)}`;
     case "MONTHLY_RENT":
-      return `월세 ${formatPrice(property.value.deposit)} / ${formatPrice(property.value.monthlyRent)}`;
+      return `월세 ${formatKoreanCurrency(property.value.deposit)} / ${formatKoreanCurrency(property.value.monthlyRent)}`;
     case "SHORT_TERM":
-      return `단기 ${formatPrice(property.value.deposit)} / ${formatPrice(property.value.monthlyRent)}`;
+      return `단기 ${formatKoreanCurrency(property.value.deposit)} / ${formatKoreanCurrency(property.value.monthlyRent)}`;
     default:
       return "-";
   }
@@ -293,7 +293,7 @@ onMounted(() => {
           </div>
           <div v-if="property.maintenanceFee">
             <dt>관리비</dt>
-            <dd>{{ formatPrice(property.maintenanceFee) }}</dd>
+            <dd>{{ formatKoreanCurrency(property.maintenanceFee) }}</dd>
           </div>
         </dl>
       </section>
