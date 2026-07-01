@@ -4,7 +4,6 @@ import dayjs from "dayjs";
 import { useAuthStore } from "../store/auth/useAuthStore";
 
 const myAxios = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },

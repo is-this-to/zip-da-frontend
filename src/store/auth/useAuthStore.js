@@ -49,9 +49,8 @@ export const useAuthStore = defineStore("authStore", () => {
     } finally {
       authInitialized.value = true;
     }
-  };
+  }; // 만료 시 여러 API 요청이 동시에 들어와도 refresh token은 한 번만 회전시킨다.
 
-  // 만료 시 여러 API 요청이 동시에 들어와도 refresh token은 한 번만 회전시킨다.
   const reissue = () => {
     if (!reissuePromise) {
       reissuePromise = performReissue().finally(() => {

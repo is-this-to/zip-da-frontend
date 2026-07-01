@@ -19,6 +19,14 @@ import PropertyEdit from "../views/property/PropertyEdit.vue";
 import PropertyDetail from "../views/property/PropertyDetail.vue";
 import ErrorPage from "../views/error/ErrorPage.vue";
 
+// ============ 마이페이지 추가 ============
+import MyPage from "../views/mypage/MyPage.vue";
+import MyProfile from "../views/mypage/MyProfile.vue";
+import MyBookmarkList from "../views/mypage/MyBookmarkList.vue";
+import MyPostList from "../views/mypage/MyPostList.vue";
+import MyReportList from "../views/mypage/MyReportList.vue";
+// ======================================
+
 // 팀원 각자파트 권한을 나눠서 routes 컴포넌트 경로 적어주세요
 const setMeta = (requiresAuth, guestOnly, roles = []) => {
   return {
@@ -94,10 +102,37 @@ const routes = [
     component: ErrorPage,
     meta: setMeta(false, false),
   },
+  // ============ 마이페이지 (담당: 장수린 / feature/mypage_JSL) ============
   {
-    path: "/admin/reports",
-    component: AdminReportManage,
-    meta: setMeta(true, false, [USER_ROLE.ADMIN]),
+    path: "/mypage",
+    component: MyPage,
+    meta: setMeta(true, false),
+    children: [
+      {
+        path: "",
+        redirect: "/mypage/profile",
+      },
+      {
+        path: "profile",
+        component: MyProfile,
+        meta: setMeta(true, false),
+      },
+      {
+        path: "bookmarks",
+        component: MyBookmarkList,
+        meta: setMeta(true, false),
+      },
+      {
+        path: "posts",
+        component: MyPostList,
+        meta: setMeta(true, false),
+      },
+      {
+        path: "reports",
+        component: MyReportList,
+        meta: setMeta(true, false),
+      },
+    ],
   },
 ];
 
@@ -114,8 +149,7 @@ router.beforeEach(async (to, from, next) => {
   const agentStore = useAgentStore();
 
   const isAdminRoute =
-    to.path === "/admins/sign-in" ||
-    to.meta.roles.includes(USER_ROLE.ADMIN);
+    to.path === "/admins/sign-in" || to.meta.roles.includes(USER_ROLE.ADMIN);
 
   if (isAdminRoute) {
     if (!adminAuthStore.authInitialized) {

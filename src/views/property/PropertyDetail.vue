@@ -6,6 +6,7 @@ import {
   getPropertyDetail,
   changePropertyStatus,
   deleteProperty,
+  updatePropertyFavorite,
 } from "../../api/propertyApi";
 import {
   PROPERTY_TYPES,
@@ -160,13 +161,19 @@ function openModal() {
 
 // 찜 처리
 const toggleLike = async () => {
-  isFavorite.value = !isFavorite.value;
+  const previousFavorite = isFavorite.value;
 
+  isFavorite.value = !isFavorite.value;
   try {
-    await updatePropertyFavorite(propertyId.value, isFavorite.value);
+    const result = await updatePropertyFavorite(propertyId.value);
+    isFavorite.value = result.isFavorite;
+
+    if (property.value && result.favoriteCount !== undefined) {
+      property.value.favoriteCount = result.favoriteCount;
+    }
   } catch (error) {
     console.error("찜하기 처리 실패", error);
-    isFavorite.value = !isFavorite.value;
+    isFavorite.value = previousFavorite;
     alert("찜하기 처리에 실패했습니다.");
   }
 };

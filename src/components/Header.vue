@@ -46,6 +46,10 @@ const redirectMain = () => {
 };
 
 const { isLoggedIn } = storeToRefs(authStore);
+
+const redirectMyPage = () => {
+  router.push("/mypage");
+};
 </script>
 
 <template>
@@ -87,6 +91,7 @@ const { isLoggedIn } = storeToRefs(authStore);
         :content="'마이페이지'"
         :color="'white'"
         :size="'small'"
+        @click="redirectMyPage"
       />
     </div>
   </div>
