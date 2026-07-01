@@ -44,14 +44,14 @@ export const changePropertyStatus = async (
   httpClient = myAxios,
 ) => {
   const url = `/api/properties/${propertyId}/status`;
-  const res = await httpClient.patch(url, { status });
+  const res = await myAxios.patch(url, { status });
   return res.data.data;
 };
 
 // ============ 매물 삭제 (soft delete) ============
 export const deleteProperty = async (propertyId, httpClient = myAxios) => {
   const url = `/api/properties/${propertyId}`;
-  const res = await httpClient.delete(url);
+  const res = await myAxios.delete(url);
   return res.data.data;
 };
 
