@@ -204,7 +204,7 @@ onMounted(() => {
         />
         <div v-if="property.images.length > 1" class="thumbnails">
           <img
-            v-for="(url, index) in property.imageUrls.slice(1)"
+            v-for="(url, index) in property.imageUrls?.slice(1)"
             :key="url"
             :src="url"
             :alt="`이미지 ${index + 2}`"
