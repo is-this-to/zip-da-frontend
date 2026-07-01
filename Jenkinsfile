@@ -7,10 +7,10 @@ pipeline {
 
     environment {
         REGISTRY      = "192.168.0.5:6901"
-        IMAGE_NAME    = "msa4/team1/client"          // <변경필요>
+        IMAGE_NAME    = "msa4/team2/client"          // <변경필요>
         CLONE_NAME    = "k8s-manifests"
         MANIFEST_REPO = "github.com/ByungjooPark/k8s-manifests.git"  // <변경필요>
-        MANIFEST_PATH = "msa4/team1/client"          // <변경필요>
+        MANIFEST_PATH = "msa4/team2/client"          // <변경필요>
         IMAGE_TAG     = "${BUILD_NUMBER}"
     }
 
