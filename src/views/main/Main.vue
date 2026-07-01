@@ -1,7 +1,9 @@
 ﻿<script setup>
-import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { onBeforeMount, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import MyButton from "../../components/button/MyButton.vue";
 import router from "../../routes/router.js";
+import myAxios from "../../api/myAxios.js";
+import { formatKoreanCurrency } from "../../util/formatter/useCurrency.js";
 
 const intro = reactive({
   eyebrow: "일반 사용자부터 공인중개사까지, 누구나 쉽고 안전하게.",
@@ -9,32 +11,23 @@ const intro = reactive({
 });
 
 // 찜 많은 매물 탑3 데이터 받아오면 될듯
-const mostLikeProperties = ref([
-  {
-    title: "강남역 신축 오피스텔",
-    subtitle: "월세 1000/70 | 서울시 강남구",
-    badge: "1등",
-    layout: "property-card--wide",
-    image:
-      "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1200&q=85",
-  },
-  {
-    title: "채광 좋은 남향 투룸",
-    subtitle: "전세 2억 | 서울시 송파구",
-    badge: "2등",
-    layout: "property-card--small",
-    image:
-      "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=900&q=85",
-  },
-  {
-    title: "풀옵션 리모델링 원룸",
-    subtitle: "월세 500/50 | 서울시 관악구",
-    badge: "3등",
-    layout: "property-card--small",
-    image:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=85",
-  },
-]);
+const mostLikeProperties = ref([]);
+
+const getPriceText = (property) => {
+  if (property.price != null) {
+    return `매매 ${formatKoreanCurrency(property.price)}`;
+  }
+
+  if (property.monthlyRent != null) {
+    return `월세 ${formatKoreanCurrency(property.deposit)} / ${formatKoreanCurrency(property.monthlyRent)}`;
+  }
+
+  return `전세 ${formatKoreanCurrency(property.deposit)}`;
+};
+
+const redirectPropertyDetail = (propertyId) => {
+  router.push(`/properties/${propertyId}`);
+};
 
 const redirectProperties = () => {
   router.push("/properties");
@@ -114,6 +107,15 @@ const setRevealRef = (element) => {
   }
 };
 
+onBeforeMount(async () => {
+  try {
+    const response = await myAxios.get("/api/bookmarks-top-3");
+    mostLikeProperties.value = response.data.data;
+  } catch (error) {
+    console.error("인기 매물을 불러오지 못했습니다.", error);
+  }
+});
+
 onMounted(() => {
   // 스크롤 감시 객체를 만듦
   observer = new IntersectionObserver(
@@ -190,6 +192,7 @@ onBeforeUnmount(() => {
       </article>
     </section>
 
+    <!-- 2차 추가 -->
     <!-- <section class="map-section" aria-label="지도 기반 탐색">
       <div class="map-copy reveal" :ref="setRevealRef">
         <span>Map search</span>
@@ -276,16 +279,20 @@ onBeforeUnmount(() => {
 
       <div class="property-grid">
         <article
-          v-for="property in mostLikeProperties"
-          :key="property.title"
+          v-for="(property, index) in mostLikeProperties"
+          :key="property.propertyId"
           class="property-card"
-          :class="property.layout"
+          :class="index === 0 ? 'property-card--wide' : 'property-card--small'"
+          @click="redirectPropertyDetail(property.propertyId)"
         >
-          <img :src="property.image" :alt="property.title" />
+          <img
+            :src="property.thumbnailUrl"
+            :alt="`매물 ${property.propertyId} 썸네일`"
+          />
+
           <div class="property-info">
-            <span>{{ property.badge }}</span>
-            <h3>{{ property.title }}</h3>
-            <p>{{ property.subtitle }}</p>
+            <span>{{ index + 1 }}위 · 찜 {{ property.bookmarkCount }}개</span>
+            <h3>{{ getPriceText(property) }}</h3>
           </div>
         </article>
       </div>
@@ -439,15 +446,16 @@ onBeforeUnmount(() => {
 
 .property-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.95fr 0.95fr;
-  grid-auto-rows: 290px;
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+  grid-template-rows: repeat(2, 290px);
   gap: 28px;
   text-align: left;
 }
 
 .property-card {
   display: flex;
-  min-height: 280px;
+  min-width: 0;
+  min-height: 0;
   flex-direction: column;
   justify-content: flex-end;
   overflow: hidden;
@@ -457,6 +465,7 @@ onBeforeUnmount(() => {
   transition:
     transform 220ms ease,
     box-shadow 220ms ease;
+  cursor: pointer;
 }
 
 .property-card:hover {
@@ -499,8 +508,20 @@ onBeforeUnmount(() => {
 }
 
 .property-card--wide {
-  grid-column: span 2;
-  grid-row: span 2;
+  grid-column: 1;
+  grid-row: 1 / 3;
+}
+
+.property-card--small {
+  grid-column: 2;
+}
+
+.property-card--small:nth-child(2) {
+  grid-row: 1;
+}
+
+.property-card--small:nth-child(3) {
+  grid-row: 2;
 }
 
 .property-card--tall {
@@ -848,19 +869,6 @@ onBeforeUnmount(() => {
   .map-section,
   .owner-section {
     gap: 42px;
-  }
-
-  .property-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .property-card--wide,
-  .property-card--medium {
-    grid-column: span 2;
-  }
-
-  .property-card--tall {
-    grid-row: span 1;
   }
 
   .owner-section {
