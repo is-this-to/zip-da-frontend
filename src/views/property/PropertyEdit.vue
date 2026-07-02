@@ -49,7 +49,7 @@ const fetchProperty = async () => {
       deposit: detail.deposit || null,
       monthlyRent: detail.monthlyRent || null,
       maintenanceFee: detail.maintenanceFee || null,
-      regionId: detail.regionId || null,
+      regionId: detail.region?.regionId || null,
       detailAddress: detail.detailAddress || "",
       areaM2: detail.areaM2 || null,
       roomCount: detail.roomCount ?? null,
@@ -57,7 +57,7 @@ const fetchProperty = async () => {
       floor: detail.floor ?? null,
       moveInDate: detail.moveInDate || "",
       optionIds: detail.options?.map((opt) => opt.optionId) ?? [],
-      imageUrls: detail.imageUrls ?? [],
+      imageUrls: detail.images?.map((img) => img.imageUrl) ?? [],
     };
   } catch (error) {
     if (myErrorStore.redirectErrorPage(error)) return;
