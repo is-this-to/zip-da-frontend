@@ -105,7 +105,7 @@ const submitLogin = async () => {
             <input type="checkbox" />
             <span>로그인 유지</span>
           </label> -->
-          <a href="#" @click="notYet">비밀번호 찾기</a>
+          <!-- <a href="#" @click="notYet">비밀번호 찾기</a> -->
         </div>
 
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
