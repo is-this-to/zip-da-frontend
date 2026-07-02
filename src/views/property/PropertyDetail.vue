@@ -69,12 +69,7 @@ const canReport = computed(() => {
   return true;
 });
 
-// 찜 가능한가?
-const canLike = computed(() => {
-  if (!property.value || !authStore.userInfo) return false;
-  if (property.value.userId === authStore.userInfo.userId) return false;
-  return true;
-});
+// 찜 초기값
 const isFavorite = ref(false);
 
 // 가격 표시 포맷
@@ -161,6 +156,11 @@ function openModal() {
 
 // 찜 처리
 const toggleLike = async () => {
+  if (authStore.userInfo === null) {
+    alert("로그인 하세요.");
+    return;
+  }
+
   const previousFavorite = isFavorite.value;
 
   isFavorite.value = !isFavorite.value;
