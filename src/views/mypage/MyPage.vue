@@ -17,8 +17,6 @@ const roleLabel = computed(() => {
 <template>
   <main class="mypage-shell">
     <aside class="mypage-sidebar">
-      <RouterLink to="/main" class="logo">Zip-da</RouterLink>
-
       <div class="member-mini-card">
         <div class="avatar">{{ displayName.slice(0, 1) }}</div>
         <div>
@@ -52,15 +50,6 @@ const roleLabel = computed(() => {
   padding: 28px 24px;
   border-right: 1px solid #e6eaf2;
   background: #fbfbff;
-}
-
-.logo {
-  display: inline-block;
-  margin-bottom: 34px;
-  color: #0064ff;
-  font-size: 27px;
-  font-weight: 900;
-  text-decoration: none;
 }
 
 .member-mini-card {

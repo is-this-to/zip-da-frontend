@@ -2,7 +2,6 @@
 import { computed, ref } from "vue";
 import MyButton from "../../components/button/MyButton.vue";
 import reportTypeCodes from "../../constants/reportType.js";
-import { useAuthStore } from "../../store/auth/useAuthStore.js";
 import myAxios from "../../api/myAxios.js";
 import { useRoute } from "vue-router";
 
@@ -18,7 +17,6 @@ const propertyId = computed(() => Number(route.params.propertyId));
 const selectedReportType = ref("");
 const reason = ref("");
 const reportType = reportTypeCodes.reportType;
-const authStore = useAuthStore();
 
 const submit = async () => {
   if (!selectedReportType.value) {
@@ -29,7 +27,6 @@ const submit = async () => {
   try {
     const payload = {
       propertyId: propertyId.value,
-      userId: authStore.userInfo.userId,
       reportType: selectedReportType.value,
       reason: reason.value,
       status: "RECEIVED",

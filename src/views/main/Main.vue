@@ -7,7 +7,7 @@ import { formatKoreanCurrency } from "../../util/formatter/useCurrency.js";
 
 const intro = reactive({
   eyebrow: "일반 사용자부터 공인중개사까지, 누구나 쉽고 안전하게.",
-  body: "원하는 집을 한눈에 살펴보고\n마음에 드는 매물을 한 곳에서 관리하세요.\n복잡한 부동산 탐색을 더 쉽고 투명하게,\nJIPDA가 당신의 다음 주거공간을 찾는 방식을 바꿔드립니다.",
+  body: "원하는 집을 한눈에 살펴보고\n마음에 드는 매물을 한 곳에서 관리하세요.\n복잡한 부동산 탐색을 더 쉽고 투명하게,\nZIPDA가 당신의 다음 주거공간을 찾는 방식을 바꿔드립니다.",
 });
 
 // 찜 많은 매물 탑3 데이터 받아오면 될듯
